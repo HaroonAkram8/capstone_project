@@ -1,1 +1,2 @@
-capstone_venv/
+capstone_venv
+__pycache__
