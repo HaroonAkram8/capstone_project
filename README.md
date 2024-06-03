@@ -23,3 +23,18 @@ To add/remove dependencies, use:
 pip install/uninstall [package_name]
 pip freeze > requirements.txt
 ```
+
+## Drone Manager
+
+The DroneManager class is responsible for controlling the drone based on user input and its environment. This is where all parts of our project come together to communicate with the drone.
+
+The following describes the available functions in the DroneManager class:
+
+**listen(self):** Continuously listen to a microphone and register user input. If a user says **"stop listening"** at any point in a sentence, end listening operations.
+
+```
+from src.drone_manager import DroneManager
+
+drone = DroneManager()
+drone.listen()
+```
