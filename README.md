@@ -4,6 +4,8 @@
 
 To find our starting guide for our team's practises, go to the link [HERE](https://docs.google.com/document/d/1EiJclbaxjeyAQCGsPbYKBOZUCOdSMVnfGlibOup19aQ/edit).
 
+### Environment Setup
+
 Run the following commands to setup your virtual environment:
 
 ```
@@ -24,13 +26,22 @@ pip install/uninstall [package_name]
 pip freeze > requirements.txt
 ```
 
+### Ollama Setup
+
+You need to have a local ollama server running to be able to continue. To do this:
+
+- Download: https://ollama.com/
+- Run an Llama3: `ollama run llama3`
+
 ## Drone Manager
 
 The DroneManager class is responsible for controlling the drone based on user input and its environment. This is where all parts of our project come together to communicate with the drone.
 
 The following describes the available functions in the DroneManager class:
 
-**listen(self):** Continuously listen to a microphone and register user input. If a user says **"stop listening"** at any point in a sentence, end listening operations.
+**listen(self, model: str, stream: bool=True):** Continuously listen to a microphone and register user input. If a user says **"stop listening"** at any point in a sentence, end listening operations.
+- model (str): The model which you would like to use with Ollama.
+- stream (bool, default=True): Setting to true will give you the response as it generates, setting to false will only return a response after it is done generating the text.
 
 ```
 from src.drone_manager import DroneManager
