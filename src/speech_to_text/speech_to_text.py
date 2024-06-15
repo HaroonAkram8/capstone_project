@@ -4,7 +4,7 @@ def speech_to_text() -> str:
     r = sr.Recognizer()
 
     with sr.Microphone() as source:
-        r.adjust_for_ambient_noise(source)
+        r.adjust_for_ambient_noise(source=source, duration=1)
 
         print("Awaiting instructions...")
         audio = r.listen(source)
