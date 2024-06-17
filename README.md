@@ -7,7 +7,7 @@ To find our starting guide for our team's practises, go to the link [HERE](https
 Run the following commands to setup your virtual environment:
 
 ```
-python3.10 -m venv ./capstone_venv   # create virtual environment for installing dependencies in root directory
+python3.11 -m venv ./capstone_venv   # create virtual environment for installing dependencies in root directory
 ./capstone_venv/Scripts/activate  # run this to activate your virtual environment if it isn't activated already
 ```
 
@@ -17,9 +17,19 @@ To install packages into your environment, run:
 pip install -r requirements.txt
 ```
 
-To add/remove dependencies, use:
+To add/remove dependencies, manually add/remove them from requirements.txt
+
+## Drone Manager
+
+The DroneManager class is responsible for controlling the drone based on user input and its environment. This is where all parts of our project come together to communicate with the drone.
+
+The following describes the available functions in the DroneManager class:
+
+**listen(self):** Continuously listen to a microphone and register user input. If a user says **"stop listening"** at any point in a sentence, end listening operations.
 
 ```
-pip install/uninstall [package_name]
-pip freeze > requirements.txt
+from src.drone_manager import DroneManager
+
+drone = DroneManager()
+drone.listen()
 ```
