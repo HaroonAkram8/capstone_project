@@ -1,6 +1,2 @@
-charset-normalizer==3.3.2
 PyAudio==0.2.14
-requests==2.32.3
 SpeechRecognition==3.10.4
-typing_extensions==4.12.1
-urllib3==2.2.1
