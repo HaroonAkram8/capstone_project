@@ -35,6 +35,18 @@ You need to have a local ollama server running to be able to continue. To do thi
 - Download: https://ollama.com/
 - Run an Llama3: `ollama run llama3`
 
+### ML Development
+
+We are using PyTorch with CUDA enabled. We are using CUDA 12.1, with the following versions for torch packages:
+
+```
+torch==2.2.0
+torchaudio==2.2.0
+torchvision==0.17.0
+```
+
+See [this link](https://pytorch.org/get-started/locally/) to find out how to set up torch with CUDA and make sure to install the versions mentioned above.
+
 ### Unsloth Setup
 
 Unsloth is a tool used for tuning LLM models. For Linux setup, follow the guide on their repo [HERE](https://github.com/unslothai/unsloth). For windows setup, follow these steps:
