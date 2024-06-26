@@ -1,11 +1,11 @@
-from src.llm.llama import Llama
+from src.llm.llm import LLM
 from src.speech_to_text.speech_to_text import speech_to_text
 
 class DroneManager:
-    def __init__(self) -> None:
-        self.llama = Llama()
+    def __init__(self, model_name: str) -> None:
+        self.model = LLM(model_name=model_name)
     
-    def listen(self, model: str, stream: bool=True) -> None:
+    def listen(self) -> None:
         while(True):
             query = speech_to_text()
             
@@ -14,12 +14,7 @@ class DroneManager:
             if "stop listening" in query:
                 break
 
-            response = self.llama.chat(model=model, prompt=query, stream=stream)
+            response = self.model.chat(prompt=query)
 
-            if stream:
-                for chunk in response:
-                    print(chunk['message']['content'], end='', flush=True)
-                print()
-            else:
-                print(response['message']['content'])
+            print(response)
             print()
