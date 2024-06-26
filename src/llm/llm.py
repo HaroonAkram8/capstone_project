@@ -10,7 +10,7 @@ class LLM:
             self.model = Llama3()
 
         else:
-            raise ValueError("Parameter must be 'phi3_mini' or 'llama3'")
+            raise ValueError("Parameter 'model_name' must be 'phi3_mini' or 'llama3'")
     
     def chat(self, prompt: str):
         return self.model.chat(prompt=prompt)
