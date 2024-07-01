@@ -28,6 +28,10 @@ You need to have a local ollama server running to be able to continue. To do thi
 - Download: https://ollama.com/
 - Run an Llama3: `ollama run llama3`
 
+### PyTorch Setup
+
+Install torch with CUDA from https://pytorch.org/get-started/locally/. This project uses torch 2.2.0 with CUDA 12.1 so use other versions at your own risk. If you do not have a cuda enabled machine, download regular torch 2.2.0.
+
 ## Drone Manager
 
 The DroneManager class is responsible for controlling the drone based on user input and its environment. This is where all parts of our project come together to communicate with the drone.
@@ -35,12 +39,11 @@ The DroneManager class is responsible for controlling the drone based on user in
 The following describes the available functions in the DroneManager class:
 
 **listen(self, model: str, stream: bool=True):** Continuously listen to a microphone and register user input. If a user says **"stop listening"** at any point in a sentence, end listening operations.
-- model (str): The model which you would like to use with Ollama.
-- stream (bool, default=True): Setting to true will give you the response as it generates, setting to false will only return a response after it is done generating the text.
+- model (str): The model which you would like to use with Ollama. Must be one of the following => ['phi3_mini', 'llama3']
 
 ```
 from src.drone_manager import DroneManager
 
-drone = DroneManager()
+drone = DroneManager(model_name="phi3_mini")
 drone.listen()
 ```
