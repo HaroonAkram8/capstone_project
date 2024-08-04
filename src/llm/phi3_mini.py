@@ -1,7 +1,7 @@
 import os
 import torch
 
-from src.globals import PHI_3_MINI_PATH, PHI_3_MINI_CHECKPOINT
+from src.globals import PHI_3_MINI_PATH, PHI_3_MINI_CHECKPOINT, PHI3_MINI_DEFAULT_SYSTEM_PROMPT
 
 # HuggingFace cache directory must be set before importing from transformers library
 os.environ['HF_HOME'] = PHI_3_MINI_PATH
@@ -22,7 +22,10 @@ class Phi3_Mini:
         self.pipe = pipeline("text-generation", model=model, tokenizer=tokenizer)
 
     def chat(self, prompt: str, generation_args: dict=DEFAULT_GEN_ARGS):
-        input = {"role": "user", "content": prompt},
+        input = [
+            PHI3_MINI_DEFAULT_SYSTEM_PROMPT,
+            {"role": "user", "content": prompt},
+        ]
         output = self.pipe(input, **generation_args)
 
         return output[0]['generated_text']
