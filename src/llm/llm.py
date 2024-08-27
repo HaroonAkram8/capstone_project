@@ -1,14 +1,15 @@
 import ollama
+from enum import Enum
 
 from src.globals import DEFAULT_SYSTEM_PROMPT
 
+class Models(Enum):
+    PHI3_MINI = "phi3:mini"
+    LLAMA3 = "llama3"
+
 class LLM:
-    def __init__(self, model_name: str):
-        # Import statements are done in these if blocks so that we don't overwrite the setting of environment variables
-        if model_name not in ["phi3:mini", "llama3"]:
-            raise ValueError("Parameter 'model_name' must be 'phi3:mini' or 'llama3'")
-        
-        self.model_name = model_name
+    def __init__(self, model: Models):
+        self.model_name = model.value
     
     def chat(self, prompt: str):
         response = ollama.chat(
