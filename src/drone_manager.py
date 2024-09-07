@@ -1,8 +1,8 @@
-from src.llm.llm import LLM
+from src.llm.llm import LLM, Models
 from src.speech_to_text.speech_to_text import speech_to_text
 
 class DroneManager:
-    def __init__(self, model: str) -> None:
+    def __init__(self, model: Models) -> None:
         self.model = LLM(model=model)
     
     def listen(self) -> None:
