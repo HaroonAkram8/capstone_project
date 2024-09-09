@@ -26,6 +26,7 @@ To add/remove dependencies, manually add/remove them from requirements.txt
 You need to have a local ollama server running to be able to continue. To do this:
 
 - Download: https://ollama.com/
+- Run a Llama3.1: `ollama run llama3.1`
 - Run a Llama3: `ollama run llama3`
 - Run a Phi3 Mini: `ollama run phi3:mini`
 
