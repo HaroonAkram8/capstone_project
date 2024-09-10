@@ -4,8 +4,9 @@ from enum import Enum
 from src.globals import DEFAULT_SYSTEM_PROMPT
 
 class Models(Enum):
-    PHI3_MINI = "phi3:mini"
+    LLAMA3_1 = "llama3.1"
     LLAMA3 = "llama3"
+    PHI3_MINI = "phi3:mini"
 
 class LLM:
     def __init__(self, model: Models):
