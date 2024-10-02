@@ -5,7 +5,9 @@ PHI_3_MINI_PATH = "./models/base_phi_3_mini"
 
 # HuggingFace Model Checkpoints
 LLAMA_3_1_BASE_CHECKPOINT = "meta-llama/Meta-Llama-3.1-8B"
+LLAMA_3_1_INSTRUCT_CHECKPOINT = "meta-llama/Meta-Llama-3.1-8B-Instruct"
 LLAMA_3_BASE_CHECKPOINT = "meta-llama/Meta-Llama-3-8B"
+LLAMA_3_INSTRUCT_CHECKPOINT = "meta-llama/Meta-Llama-3-8B-Instruct"
 PHI_3_MINI_CHECKPOINT = "microsoft/Phi-3-mini-4k-instruct"
 
 # System Prompts
