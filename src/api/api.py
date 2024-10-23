@@ -24,23 +24,49 @@ class DroneController():
     def __end__(self):
         self.client.armDisarm(False)
         self.client.enableApiControl(False)
+    
+    def get_function(self, key: str):
+        if key not in self.functions:
+            return None
+        
+        return self.functions[key]
 
 # Example usage
 if __name__ == "__main__":
+    from collections import deque 
+
     drone = DroneController()
+    
+    command_order = [
+        {"cmd": TAKEOFF, "params": {}},
+        {"cmd": ROTATE, "params": {"yaw": 90}},
+        {"cmd": MOVE_POS, "params": {"x": 1, "y": 2, "z": -5, "velocity": 1}},
+        {"cmd": MOVE_POS, "params": {"x": 0, "y": 0, "z": -1, "velocity": 3}},
+        {"cmd": LAND, "params": {}},
+        {"cmd": END, "params": {}},
+    ]
+
+    queue = deque()
+
+    for cmd_param in command_order:
+        cmd = cmd_param["cmd"]
+        params = cmd_param["params"]
+
+        f = drone.get_function(cmd)
+
+        if f is not None:
+            queue.append((f, params, cmd != END))
 
     position = {"x": 5, "y": 10, "z": -7}
     rotate = {"angle_deg": 90, "rate_deg_per_sec": 30}
 
-    # Perform basic movements
-    drone.functions[TAKEOFF]().join()
-    # print(drone.client.getMultirotorState())
-    drone.functions[ROTATE](rotate["angle_deg"]).join()
-    print("movement 1 done")
-    drone.functions[MOVE_POS](position["x"], position["y"], position["z"], velocity=5).join()
-    print("movement 2 done")
-    drone.functions[MOVE_POS](0, 0, -1, velocity=5).join()
-    time.sleep(3)
-    drone.functions[LAND]().join()
+    while queue:
+        func, args, is_async = queue.popleft()
 
-    drone.functions[END]()
+        if is_async:
+            func(**args).join()
+            continue
+        else:
+            func(**args)
+        
+        time.sleep(1)
