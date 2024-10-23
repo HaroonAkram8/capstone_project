@@ -1,6 +1,10 @@
 import airsim
 import time
 
+from src.globals import (
+    MOVE_POS, MOVE_VEL, ROTATE, TAKEOFF, LAND, END
+)
+
 class DroneController():
     def __init__(self):
         self.client = airsim.MultirotorClient()
@@ -8,38 +12,61 @@ class DroneController():
         self.client.enableApiControl(True)
         self.client.armDisarm(True)
 
-        print("Drone initialized and ready.")
+        self.functions = {
+            MOVE_POS: self.client.moveToPositionAsync,
+            MOVE_VEL: self.client.moveByVelocityAsync, # May need to be removed
+            ROTATE: self.client.rotateToYawAsync,
+            TAKEOFF: self.client.takeoffAsync,
+            LAND: self.client.landAsync,
+            END: self.__end__,
+        }
     
-    def takeoff(self, altitude=5):
-        print("Taking off...")
-
-        self.client.takeoffAsync().join()
-        self.client.moveToZAsync(-altitude, 5).join()
-
-        print(f"Reached altitude: {altitude} meters")
-
-    def land(self):
-        print("Landing...")
-
-        self.client.landAsync().join()
+    def __end__(self):
         self.client.armDisarm(False)
         self.client.enableApiControl(False)
-
-        print("Drone landed and disarmed.")
+    
+    def get_function(self, key: str):
+        if key not in self.functions:
+            return None
+        
+        return self.functions[key]
 
 # Example usage
 if __name__ == "__main__":
-    drone = DroneController()
+    from collections import deque 
 
-    velocity = {"x": 5, "y": 10, "z": 7}
+    drone = DroneController()
+    
+    command_order = [
+        {"cmd": TAKEOFF, "params": {}},
+        {"cmd": ROTATE, "params": {"yaw": 90}},
+        {"cmd": MOVE_POS, "params": {"x": 1, "y": 2, "z": -5, "velocity": 1}},
+        {"cmd": MOVE_POS, "params": {"x": 0, "y": 0, "z": -1, "velocity": 3}},
+        {"cmd": LAND, "params": {}},
+        {"cmd": END, "params": {}},
+    ]
+
+    queue = deque()
+
+    for cmd_param in command_order:
+        cmd = cmd_param["cmd"]
+        params = cmd_param["params"]
+
+        f = drone.get_function(cmd)
+
+        if f is not None:
+            queue.append((f, params, cmd != END))
+
+    position = {"x": 5, "y": 10, "z": -7}
     rotate = {"angle_deg": 90, "rate_deg_per_sec": 30}
 
-    # Perform basic movements
-    drone.takeoff()
-    drone.client.moveByVelocityAsync(velocity["x"], velocity["y"], velocity["z"], duration=5).join()
-    print("movement 1 done")
-    drone.client.moveByVelocityAsync(-velocity["x"], -velocity["y"], -velocity["z"], duration=5).join()
-    print("movement 2 done")
-    drone.client.goHomeAsync().join()
-    print("Returned home")
-    drone.land()
+    while queue:
+        func, args, is_async = queue.popleft()
+
+        if is_async:
+            func(**args).join()
+            continue
+        else:
+            func(**args)
+        
+        time.sleep(1)
