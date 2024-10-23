@@ -5,7 +5,7 @@ from src.globals import (
     MOVE_POS, MOVE_VEL, ROTATE, TAKEOFF, LAND, END
 )
 
-class DroneController():
+class DroneAPI():
     def __init__(self):
         self.client = airsim.MultirotorClient()
         self.client.confirmConnection()
@@ -35,7 +35,7 @@ class DroneController():
 if __name__ == "__main__":
     from collections import deque 
 
-    drone = DroneController()
+    drone = DroneAPI()
     
     command_order = [
         {"cmd": TAKEOFF, "params": {}},
