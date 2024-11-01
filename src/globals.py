@@ -19,9 +19,27 @@ DEFAULT_SYSTEM_PROMPT = {
 }
 
 # Airsim Mapping Keys
-MOVE_POS = "move_pos"
-MOVE_VEL = "move_vel"
-ROTATE = "rotate"
-TAKEOFF = "takeoff"
-LAND = "land"
-END = "end"
+CMD_KEY_WORDS = {
+    "MOVE_POS": "move",
+    "MOVE_REL": "relative_move",
+    "ROTATE": "rotate",
+    "TAKEOFF": "takeoff",
+    "LAND": "land",
+    "LOCATE": "locate",
+    "END": "end",
+}
+
+# Instruction Splits
+INSTRUCTION_MARKER = ", "
+PARAMETER_MARKER = " "
+ASSIGNMENT_MARKER = "="
+
+# Default Drone Language Key Words
+KEY_WORDS = {
+    "SLOW": 1,
+    "MODERATE": 3,
+    "FAST": 5,
+    "SHORT": 1,
+    "INTERMEDIATE": 3,
+    "FAR": 5
+}
