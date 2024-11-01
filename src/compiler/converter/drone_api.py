@@ -2,7 +2,7 @@ import airsim
 import time
 
 from src.globals import (
-    MOVE_POS, MOVE_VEL, ROTATE, TAKEOFF, LAND, END
+    CMD_KEY_WORDS
 )
 
 class DroneAPI():
@@ -13,13 +13,25 @@ class DroneAPI():
         self.client.armDisarm(True)
 
         self.functions = {
-            MOVE_POS: self.client.moveToPositionAsync,
-            MOVE_VEL: self.client.moveByVelocityAsync, # May need to be removed
-            ROTATE: self.client.rotateToYawAsync,
-            TAKEOFF: self.client.takeoffAsync,
-            LAND: self.client.landAsync,
-            END: self.__end__,
+            CMD_KEY_WORDS["MOVE_POS"]: self.client.moveToPositionAsync,
+            CMD_KEY_WORDS["MOVE_REL"]: self.client.moveToPositionAsync, #self.client.moveByVelocityAsync,
+            CMD_KEY_WORDS["ROTATE"]: self.client.rotateToYawAsync,
+            CMD_KEY_WORDS["TAKEOFF"]: self.client.takeoffAsync,
+            CMD_KEY_WORDS["LAND"]: self.client.landAsync,
+            CMD_KEY_WORDS["END"]: self.__end__,
         }
+    
+    def current_position(self):
+        state = self.client.getMultirotorState()
+        state = state.kinematics_estimated.position
+
+        position = {
+            "x": state.x_val,
+            "y": state.y_val,
+            "z": state.z_val
+        }
+
+        return position
     
     def __end__(self):
         self.client.armDisarm(False)
@@ -36,37 +48,4 @@ if __name__ == "__main__":
     from collections import deque 
 
     drone = DroneAPI()
-    
-    command_order = [
-        {"cmd": TAKEOFF, "params": {}},
-        {"cmd": ROTATE, "params": {"yaw": 90}},
-        {"cmd": MOVE_POS, "params": {"x": 1, "y": 2, "z": -5, "velocity": 1}},
-        {"cmd": MOVE_POS, "params": {"x": 0, "y": 0, "z": -1, "velocity": 3}},
-        {"cmd": LAND, "params": {}},
-        {"cmd": END, "params": {}},
-    ]
-
-    queue = deque()
-
-    for cmd_param in command_order:
-        cmd = cmd_param["cmd"]
-        params = cmd_param["params"]
-
-        f = drone.get_function(cmd)
-
-        if f is not None:
-            queue.append((f, params, cmd != END))
-
-    position = {"x": 5, "y": 10, "z": -7}
-    rotate = {"angle_deg": 90, "rate_deg_per_sec": 30}
-
-    while queue:
-        func, args, is_async = queue.popleft()
-
-        if is_async:
-            func(**args).join()
-            continue
-        else:
-            func(**args)
-        
-        time.sleep(1)
+    print(drone.current_position())
