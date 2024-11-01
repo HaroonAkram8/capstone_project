@@ -1,41 +1,46 @@
 from collections import deque
 
 from src.compiler.converter.drone_api import DroneAPI
-from src.globals import (
-    MOVE_POS, MOVE_VEL, ROTATE, TAKEOFF, LAND, END
-)
+from src.compiler.converter.parser import ParameterParser
+from src.compiler.converter.generate import ParameterGenerator
+from src.globals import CMD_KEY_WORDS
 
 class Compiler():
-    def __init__(self, drone_api: DroneAPI):
+    def __init__(self, drone_api: DroneAPI, param_gen: ParameterGenerator):
         self.drone_api = drone_api
+        self.param_gen = param_gen
         self.api_queue = deque()
-
-        # Create a dictionary mapping the command key to a parameter finding function
-        # Use it in _get_params()
     
-    def compile_and_run(self, drone_lang: str):
-        # TODO: Apply drone language splitting etc.
-        pass
+    def compile(self, instructions: str):
+        parser = ParameterParser(instructions=instructions)
+        parser.parse()
+        commands = parser.cmd_seq()
 
-        # TODO: For every individual drone language command, use _add
-        pass
+        for c, p in commands:
+            if c == CMD_KEY_WORDS["LOCATE"]:
+                # TODO: vision model implementation
+                continue
 
-        # TODO: execute all drone api calls
-        pass
+            self._add(cmd=c, params=p)
 
-    
-    def _get_params(self, cmd: str):
-        # TODO
-        return {}
-    
-    def _add(self, cmd: str):
+    def run(self):
+        while self.api_queue:
+            func, args, is_async = self.api_queue.popleft()
+
+            if is_async:
+                func(**args).join()
+                continue
+            
+            func(**args)
+
+    def _add(self, cmd: str, params: dict):
         f = self.drone_api.get_function(cmd)
 
         if f is None:
             return
         
-        params = self._get_params(cmd=cmd)
-        is_async = cmd != END
+        params = self.param_gen.generate(cmd=cmd, parameters=params)
+        is_async = cmd != CMD_KEY_WORDS["END"]
 
         self.api_queue.append((f, params, is_async))
     
@@ -54,3 +59,14 @@ class Compiler():
             return
         
         func(**args)
+
+# Example usage
+if __name__ == "__main__":
+    example1 = "takeoff, move x=1 y=2 z=-3 v=4, rotate deg=87, relative_move x=7 v=9, relative_move z=-7 t=FAST, land object=table"
+
+    drone = DroneAPI()
+    param_gen = ParameterGenerator(current_position=drone.current_position)
+    compiler = Compiler(drone_api=drone, param_gen=param_gen)
+
+    compiler.compile(instructions=example1)
+    compiler.run()
