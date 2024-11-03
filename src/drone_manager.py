@@ -8,10 +8,10 @@ class DroneManager:
     def __init__(self, model: Models) -> None:
         self.model = LLM(model=model)
 
-        drone = DroneAPI()
-        generator = ParameterGenerator(current_position=drone.current_position)
+        self.drone = DroneAPI()
+        self.generator = ParameterGenerator(current_position=self.drone.current_position)
 
-        self.compiler = Compiler(drone_api=drone, param_gen=generator)
+        self.compiler = Compiler(drone_api=self.drone, param_gen=self.generator)
     
     def listen(self) -> None:
         while(True):
@@ -22,7 +22,8 @@ class DroneManager:
             if "stop listening" in query:
                 break
 
-            response = self.model.chat(prompt=query)
+            prompt = f"Drone State: {str(self.drone.current_position())}\nMovement Instructions: {query}"
+            response = self.model.chat(prompt=prompt)
 
             print(response)
             print()
