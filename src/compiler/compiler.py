@@ -3,7 +3,7 @@ from collections import deque
 from src.compiler.converter.drone_api import DroneAPI
 from src.compiler.converter.parser import ParameterParser
 from src.compiler.converter.generate import ParameterGenerator
-from src.globals import CMD_KEY_WORDS
+from src.globals import END, LOCATE
 
 class Compiler():
     def __init__(self, drone_api: DroneAPI, param_gen: ParameterGenerator):
@@ -17,7 +17,7 @@ class Compiler():
         commands = parser.cmd_seq()
 
         for c, p in commands:
-            if c == CMD_KEY_WORDS["LOCATE"]:
+            if c == LOCATE:
                 # TODO: vision model implementation
                 continue
 
@@ -40,7 +40,7 @@ class Compiler():
             return
         
         params = self.param_gen.generate(cmd=cmd, parameters=params)
-        is_async = cmd != CMD_KEY_WORDS["END"]
+        is_async = cmd != END
 
         self.api_queue.append((f, params, is_async))
     
