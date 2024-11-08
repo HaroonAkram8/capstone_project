@@ -41,7 +41,7 @@ class ParameterParser():
 
 # Example usage
 if __name__ == "__main__":
-    example1 = "takeoff, move x=1 y=2 z=-3 v=4, rotate deg=87, relative_move x=7 v=9, land object=table"
+    example1 = "takeoff, move x=1 y=2 z=-3 v=4, rotate deg=87, position_move x=7 v=9, land object=table"
 
     parser = ParameterParser(instructions=example1)
     parser.parse()

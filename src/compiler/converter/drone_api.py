@@ -1,5 +1,6 @@
 import airsim
 import time
+import math
 
 from src.globals import (
     CMD_KEY_WORDS
@@ -14,7 +15,7 @@ class DroneAPI():
 
         self.functions = {
             CMD_KEY_WORDS["MOVE_POS"]: self.client.moveToPositionAsync,
-            CMD_KEY_WORDS["MOVE_REL"]: self.client.moveToPositionAsync, #self.client.moveByVelocityAsync,
+            CMD_KEY_WORDS["MOVE_DIST"]: self.client.moveToPositionAsync, #self.client.moveByVelocityAsync,
             CMD_KEY_WORDS["ROTATE"]: self.client.rotateToYawAsync,
             CMD_KEY_WORDS["TAKEOFF"]: self.client.takeoffAsync,
             CMD_KEY_WORDS["LAND"]: self.client.landAsync,
@@ -23,12 +24,15 @@ class DroneAPI():
     
     def current_position(self):
         state = self.client.getMultirotorState()
-        state = state.kinematics_estimated.position
+
+        position = state.kinematics_estimated.position
+        orientation = state.kinematics_estimated.orientation
 
         position = {
-            "x": state.x_val,
-            "y": state.y_val,
-            "z": state.z_val
+            "x": position.x_val,
+            "y": position.y_val,
+            "z": position.z_val,
+            "yaw": airsim.to_eularian_angles(orientation)[2]
         }
 
         return position
@@ -45,7 +49,5 @@ class DroneAPI():
 
 # Example usage
 if __name__ == "__main__":
-    from collections import deque 
-
     drone = DroneAPI()
     print(drone.current_position())
