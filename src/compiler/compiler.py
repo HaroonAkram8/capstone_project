@@ -62,11 +62,11 @@ class Compiler():
 
 # Example usage
 if __name__ == "__main__":
-    example1 = "takeoff, move x=1 y=2 z=-3 v=4, rotate deg=87, relative_move x=7 v=9, relative_move z=-7 t=FAST, land object=table"
+    example1 = "POSITION_MOVE x=3 y=5 z=2, DISTANCE_MOVE forward_distance=5, VELOCITY_MOVE forward_velocity=MODERATE duration=1, ROTATE yaw=-90, LAND"
 
     drone = DroneAPI()
     param_gen = ParameterGenerator(current_position=drone.current_position)
     compiler = Compiler(drone_api=drone, param_gen=param_gen)
 
-    compiler.compile(instructions=example1)
+    compiler.compile(instructions=example1.lower())
     compiler.run()
