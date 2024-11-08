@@ -3,7 +3,7 @@ import time
 import math
 
 from src.globals import (
-    CMD_KEY_WORDS
+    MOVE_POS, MOVE_DIST, MOVE_VEL, ROTATE, TAKEOFF, LAND, END
 )
 
 class DroneAPI():
@@ -14,12 +14,13 @@ class DroneAPI():
         self.client.armDisarm(True)
 
         self.functions = {
-            CMD_KEY_WORDS["MOVE_POS"]: self.client.moveToPositionAsync,
-            CMD_KEY_WORDS["MOVE_DIST"]: self.client.moveToPositionAsync, #self.client.moveByVelocityAsync,
-            CMD_KEY_WORDS["ROTATE"]: self.client.rotateToYawAsync,
-            CMD_KEY_WORDS["TAKEOFF"]: self.client.takeoffAsync,
-            CMD_KEY_WORDS["LAND"]: self.client.landAsync,
-            CMD_KEY_WORDS["END"]: self.__end__,
+            MOVE_POS: self.client.moveToPositionAsync,
+            MOVE_DIST: self.client.moveToPositionAsync,
+            MOVE_VEL: self.client.moveByVelocityAsync,
+            ROTATE: self.client.rotateToYawAsync,
+            TAKEOFF: self.client.takeoffAsync,
+            LAND: self.client.landAsync,
+            END: self.__end__,
         }
     
     def current_position(self):

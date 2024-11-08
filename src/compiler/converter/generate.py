@@ -1,14 +1,14 @@
 import math
 
-from src.globals import CMD_KEY_WORDS, KEY_WORDS
+from src.globals import MOVE_POS, MOVE_DIST, MOVE_VEL, KEY_WORDS
 
 class ParameterGenerator():
     def __init__(self, current_position) -> None:
         self.current_position = current_position
         self.mappings = {
-            CMD_KEY_WORDS["MOVE_POS"]: self._move_positionally,
-            CMD_KEY_WORDS["MOVE_DIST"]: self._move_distance,
-            CMD_KEY_WORDS["MOVE_VEL"]: self._move_velocity,
+            MOVE_POS: self._move_positionally,
+            MOVE_DIST: self._move_distance,
+            MOVE_VEL: self._move_velocity,
         }
 
     def generate(self, cmd, parameters):
@@ -35,7 +35,21 @@ class ParameterGenerator():
     def _move_distance(self, parameters):
         curr_pos = self.current_position()
 
-        for dir in ["forward_distance", "right_distance", "up_distance"]:
+        gen_p = self._project_to_xy(parameters=parameters, yaw=curr_pos['yaw'], p_names=["forward_distance", "right_distance", "up_distance"], out_names=['x', 'y', 'z'])        
+        gen_p = self._velocity(parameters=parameters, curr_pos=curr_pos, gen_p=gen_p)
+
+        return gen_p
+    
+    def _move_velocity(self, parameters):
+        curr_pos = self.current_position()
+
+        gen_p = self._project_to_xy(parameters=parameters, yaw=curr_pos['yaw'], p_names=["forward_velocity", "right_velocity", "up_velocity"], out_names=['vx', 'vy', 'vz']) 
+        gen_p = self._distance(parameters=parameters, gen_p=gen_p)
+
+        return gen_p
+    
+    def _project_to_xy(self, parameters, yaw, p_names, out_names):
+        for dir in p_names:
             if dir not in parameters:
                 parameters[dir] = 0.0
                 continue
@@ -43,27 +57,11 @@ class ParameterGenerator():
             parameters[dir] = self._get_val(parameter_value=parameters[dir])
         
         gen_p = {
-            'x': parameters["forward_distance"] * math.cos(curr_pos['yaw']) + parameters["right_distance"] * math.cos(math.pi / 2 - curr_pos['yaw']),
-            'y': parameters["forward_distance"] * math.sin(curr_pos['yaw']) - parameters["right_distance"] * math.sin(math.pi / 2 - curr_pos['yaw']),
-            'z': parameters["up_distance"],
+            out_names[0]: parameters[p_names[0]] * math.cos(yaw) + parameters[p_names[1]] * math.cos(math.pi / 2 - yaw),
+            out_names[1]: parameters[p_names[0]] * math.sin(yaw) - parameters[p_names[1]] * math.sin(math.pi / 2 - yaw),
+            out_names[2]: parameters[p_names[2]],
         }
-        
-        gen_p = self._velocity(parameters=parameters, curr_pos=curr_pos, gen_p=gen_p)
-        return gen_p
-    
-    def _move_velocity(self, parameters):
-        curr_pos = self.current_position()
-        gen_p = {}
 
-        for dir in ["x", "y", "z"]:
-            gen_p[dir] = curr_pos[dir]
-
-            if dir not in parameters:
-                continue
-
-            gen_p[dir] += self._get_val(parameter_value=parameters[dir])
-        
-        gen_p = self._velocity(parameters=parameters, curr_pos=curr_pos, gen_p=gen_p)
         return gen_p
     
     def _get_val(self, parameter_value):
@@ -74,18 +72,32 @@ class ParameterGenerator():
         
         return value
     
+    def _distance(self, parameters, gen_p):
+        if "duration" in parameters:
+            gen_p["duration"] = self._get_val(parameter_value=parameters["duration"])
+        elif "distance" in parameters:
+            gen_p["duration"] = self._get_val(parameter_value=parameters["distance"]) / self._velocity_magnitude(gen_p=gen_p)
+        else:
+            gen_p["duration"] = KEY_WORDS["INTERMEDIATE"]
+        
+        return gen_p
+    
     def _velocity(self, parameters, curr_pos, gen_p):
         if "velocity" in parameters:
             gen_p["velocity"] = self._get_val(parameter_value=parameters["velocity"])
         elif "duration" in parameters:
-            distance = self._distance(curr_pos=curr_pos, gen_p=gen_p)
+            distance = self.distance_magnitude(curr_pos=curr_pos, gen_p=gen_p)
             gen_p["velocity"] = distance / self._get_val(parameter_value=parameters["duration"])
         else:
             gen_p["velocity"] = KEY_WORDS["MODERATE"]
         
         return gen_p
     
-    def _distance(self, curr_pos, gen_p):
+    def _velocity_magnitude(self, gen_p):
+        velocity = pow(gen_p["vx"] ** 2 + gen_p["vy"] ** 2 + gen_p["vz"] ** 2, 0.5)
+        return velocity
+    
+    def distance_magnitude(self, curr_pos, gen_p):
         distance = pow((curr_pos["x"] - gen_p["x"]) ** 2 + (curr_pos["y"] - gen_p["y"]) ** 2 + (curr_pos["z"] - gen_p["z"]) ** 2, 0.5)
         return distance
 
@@ -96,17 +108,17 @@ if __name__ == "__main__":
             'x': 0.0,
             'y': 0.0,
             'z': 0.0,
-            'yaw': math.pi / 3
+            'yaw': 0
         }
 
     example1 = {
-        "forward_distance": '7',
-        "right_distance": '4',
-        "up_distance": '5',
-        "velocity": '2'
+        "forward_velocity": '7',
+        "right_velocity": '4',
+        "up_velocity": '5',
+        "duration": '2'
     }
 
     generator = ParameterGenerator(current_position=test_position)
 
-    gen_p = generator.generate(cmd=CMD_KEY_WORDS["MOVE_DIST"], parameters=example1)
+    gen_p = generator.generate(cmd=MOVE_VEL, parameters=example1)
     print(gen_p)
