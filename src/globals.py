@@ -20,8 +20,9 @@ DEFAULT_SYSTEM_PROMPT = {
 
 # Airsim Mapping Keys
 CMD_KEY_WORDS = {
-    "MOVE_POS": "move",
-    "MOVE_REL": "relative_move",
+    "MOVE_POS": "position_move",
+    "MOVE_DIST": "distance_move",
+    "MOVE_VEL": "velocity_move",
     "ROTATE": "rotate",
     "TAKEOFF": "takeoff",
     "LAND": "land",
