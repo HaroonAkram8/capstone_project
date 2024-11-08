@@ -1,9 +1,8 @@
 import airsim
 import time
-import math
 
 from src.globals import (
-    MOVE_POS, MOVE_DIST, MOVE_VEL, ROTATE, TAKEOFF, LAND, END
+    MOVE_POS, MOVE_DIST, MOVE_VEL, ROTATE, TAKEOFF, LAND, END, WAIT
 )
 
 class DroneAPI():
@@ -20,6 +19,7 @@ class DroneAPI():
             ROTATE: self.client.rotateToYawAsync,
             TAKEOFF: self.client.takeoffAsync,
             LAND: self.client.landAsync,
+            WAIT: self.__wait__,
             END: self.__end__,
         }
     
@@ -37,6 +37,9 @@ class DroneAPI():
         }
 
         return position
+    
+    def __wait__(self, duration):
+        time.sleep(duration)
     
     def __end__(self):
         self.client.armDisarm(False)
