@@ -13,7 +13,7 @@ class ParameterGenerator():
 
     def generate(self, cmd, parameters):
         if cmd not in self.mappings:
-            return {}
+            return parameters
         
         gen_p = self.mappings[cmd](parameters=parameters)
         return gen_p
