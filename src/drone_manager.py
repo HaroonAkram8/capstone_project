@@ -5,8 +5,8 @@ from src.compiler.converter.generate import ParameterGenerator
 from src.compiler.compiler import Compiler
 
 class DroneManager:
-    def __init__(self, model: Models) -> None:
-        self.model = LLM(model=model)
+    def __init__(self, model: Models, system_prompt: str) -> None:
+        self.model = LLM(model=model, system_prompt=system_prompt)
 
         self.drone = DroneAPI()
         self.generator = ParameterGenerator(current_position=self.drone.current_position)
@@ -22,7 +22,7 @@ class DroneManager:
             if "stop listening" in query:
                 break
 
-            prompt = f"Drone State: {str(self.drone.current_position())}\nMovement Instructions: {query}"
+            prompt = f"Drone State: {str(self.drone.current_position(in_degrees=True))}\nMovement Instructions: {query}"
             response = self.model.chat(prompt=prompt)
 
             print(response)
