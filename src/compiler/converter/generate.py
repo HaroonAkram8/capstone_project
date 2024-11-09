@@ -1,6 +1,6 @@
 import math
 
-from src.globals import MOVE_POS, MOVE_DIST, MOVE_VEL, KEY_WORDS
+from src.globals import MOVE_POS, MOVE_DIST, MOVE_VEL, ROTATE, KEY_WORDS
 
 class ParameterGenerator():
     def __init__(self, current_position) -> None:
@@ -9,6 +9,7 @@ class ParameterGenerator():
             MOVE_POS: self._move_positionally,
             MOVE_DIST: self._move_distance,
             MOVE_VEL: self._move_velocity,
+            ROTATE: self._rotate,
         }
 
     def generate(self, cmd, parameters):
@@ -16,6 +17,20 @@ class ParameterGenerator():
             return parameters
         
         gen_p = self.mappings[cmd](parameters=parameters)
+        return gen_p
+    
+    def _rotate(self, parameters):
+        duration = KEY_WORDS["INTERMEDIATE"]
+        if "duration" in parameters:
+            duration = self._get_val(parameter_value=parameters["duration"])
+
+        yaw_rate = self._get_val(parameter_value=parameters["yaw"]) / duration
+
+        gen_p = {
+            "yaw_rate": yaw_rate,
+            "duration": duration,
+        }
+
         return gen_p
 
     def _move_positionally(self, parameters):
