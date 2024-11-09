@@ -13,7 +13,7 @@ class ParameterParser():
     def parse(self):
         for instruct in self.instructions:
             command, parameters = self._split(instruction=instruct)
-            self.commands.append((command, parameters))
+            self.commands.append((command.lower(), parameters))
     
     def print_cmds(self):
         for c, p in self.commands:

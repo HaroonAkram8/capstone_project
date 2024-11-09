@@ -1,5 +1,6 @@
 import airsim
 import time
+import math
 
 from src.globals import (
     MOVE_POS, MOVE_DIST, MOVE_VEL, ROTATE, TAKEOFF, LAND, END, WAIT
@@ -16,14 +17,14 @@ class DroneAPI():
             MOVE_POS: self.client.moveToPositionAsync,
             MOVE_DIST: self.client.moveToPositionAsync,
             MOVE_VEL: self.client.moveByVelocityAsync,
-            ROTATE: self.client.rotateToYawAsync,
+            ROTATE: self.client.rotateByYawRateAsync,
             TAKEOFF: self.client.takeoffAsync,
             LAND: self.client.landAsync,
             WAIT: self.__wait__,
             END: self.__end__,
         }
     
-    def current_position(self):
+    def current_position(self, in_degrees: bool=False):
         state = self.client.getMultirotorState()
 
         position = state.kinematics_estimated.position
@@ -35,6 +36,9 @@ class DroneAPI():
             "z": position.z_val,
             "yaw": airsim.to_eularian_angles(orientation)[2]
         }
+
+        if in_degrees:
+            position["yaw"] = math.degrees(position["yaw"])
 
         return position
     
