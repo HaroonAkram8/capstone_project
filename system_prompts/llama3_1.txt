@@ -33,7 +33,7 @@ VELOCITY_MOVE [forward_velocity] [right_velocity] [up_velocity] [distance] [dura
 - distance (optional): The scalar distance the drone should move.
 - duration (optional): The time it takes for the drone to reach the position.
 
-ROTATE [yaw]: Rotate the drone.
+ROTATE [yaw] [duration]: Rotate the drone.
 - yaw: Rotate by the specified amount in degrees.
 - duration (optional): The time it takes for the drone to complete its rotation.
 
