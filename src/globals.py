@@ -48,13 +48,16 @@ ASSIGNMENT_MARKER = "="
 
 # Default Drone Language Key Words
 KEY_WORDS = {
-    "SLOW": 1, # velocity
-    "MODERATE": 3, # velocity
-    "FAST": 5, # velocity
-    "SHORT": 1, # distance
-    "MEDIUM": 3, # distance
-    "FAR": 5, # distance
-    "QUICK": 1, # time
-    "INTERMEDIATE": 3, # time
-    "LONG": 5, # time
+    "slow": 1, # velocity
+    "moderate": 3, # velocity
+    "fast": 5, # velocity
+    "short": 1, # distance
+    "medium": 3, # distance
+    "far": 5, # distance
+    "quick": 1, # time
+    "intermediate": 3, # time
+    "long": 5, # time
 }
+
+# Separators
+DEBUG_SEPARATOR = "=" * 175

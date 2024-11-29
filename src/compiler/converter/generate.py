@@ -1,6 +1,6 @@
 import math
 
-from src.globals import MOVE_POS, MOVE_DIST, MOVE_VEL, ROTATE, KEY_WORDS
+from src.globals import MOVE_POS, MOVE_DIST, MOVE_VEL, ROTATE, WAIT, KEY_WORDS
 
 class ParameterGenerator():
     def __init__(self, current_position) -> None:
@@ -10,6 +10,7 @@ class ParameterGenerator():
             MOVE_DIST: self._move_distance,
             MOVE_VEL: self._move_velocity,
             ROTATE: self._rotate,
+            WAIT: self._wait,
         }
 
     def generate(self, cmd, parameters):
@@ -19,8 +20,19 @@ class ParameterGenerator():
         gen_p = self.mappings[cmd](parameters=parameters)
         return gen_p
     
+    def _wait(self, parameters):
+        duration = KEY_WORDS["intermediate"]
+        if "duration" in parameters:
+            duration = self._get_val(parameter_value=parameters["duration"])
+
+        gen_p = {
+            "duration": duration,
+        }
+
+        return gen_p
+    
     def _rotate(self, parameters):
-        duration = KEY_WORDS["INTERMEDIATE"]
+        duration = KEY_WORDS["intermediate"]
         if "duration" in parameters:
             duration = self._get_val(parameter_value=parameters["duration"])
 
@@ -52,6 +64,10 @@ class ParameterGenerator():
 
         gen_p = self._project_to_xy(parameters=parameters, yaw=curr_pos['yaw'], p_names=["forward_distance", "right_distance", "up_distance"], out_names=['x', 'y', 'z'])        
         gen_p = self._velocity(parameters=parameters, curr_pos=curr_pos, gen_p=gen_p)
+        
+        gen_p["x"] += curr_pos["x"]
+        gen_p["y"] += curr_pos["y"]
+        gen_p["z"] += curr_pos["z"]
 
         return gen_p
     
@@ -83,7 +99,10 @@ class ParameterGenerator():
         try:
             value = float(parameter_value)
         except ValueError:
-            value = KEY_WORDS[parameter_value]
+            if parameter_value in KEY_WORDS:
+                value = KEY_WORDS[parameter_value]
+            else:
+                value = 1
         
         return value
     
@@ -93,7 +112,7 @@ class ParameterGenerator():
         elif "distance" in parameters:
             gen_p["duration"] = self._get_val(parameter_value=parameters["distance"]) / self._velocity_magnitude(gen_p=gen_p)
         else:
-            gen_p["duration"] = KEY_WORDS["INTERMEDIATE"]
+            gen_p["duration"] = KEY_WORDS["intermediate"]
         
         return gen_p
     
@@ -104,7 +123,7 @@ class ParameterGenerator():
             distance = self.distance_magnitude(curr_pos=curr_pos, gen_p=gen_p)
             gen_p["velocity"] = distance / self._get_val(parameter_value=parameters["duration"])
         else:
-            gen_p["velocity"] = KEY_WORDS["MODERATE"]
+            gen_p["velocity"] = KEY_WORDS["moderate"]
         
         return gen_p
     
