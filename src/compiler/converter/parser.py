@@ -13,7 +13,7 @@ class ParameterParser():
     def parse(self):
         for instruct in self.instructions:
             command, parameters = self._split(instruction=instruct)
-            self.commands.append((command.lower(), parameters))
+            self.commands.append((command, parameters))
     
     def print_cmds(self):
         for c, p in self.commands:
@@ -23,7 +23,7 @@ class ParameterParser():
 
     def _split(self, instruction: str):
         split_instruc = instruction.split(PARAMETER_MARKER)
-        command = split_instruc[0]
+        command = split_instruc[0].lower()
 
         if len(split_instruc) == 1:
             return command, {}
@@ -35,7 +35,7 @@ class ParameterParser():
             
             p, v = param.split(ASSIGNMENT_MARKER)
 
-            parameters[p] = v
+            parameters[p] = v.lower()
         
         return command, parameters
 

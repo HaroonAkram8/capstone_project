@@ -7,6 +7,9 @@ from src.compiler.compiler import Compiler
 class DroneManager:
     def __init__(self, model: Models, system_prompt: str) -> None:
         self.model = LLM(model=model, system_prompt=system_prompt)
+        self.model.chat(prompt="Hello world")
+
+        input("Model loaded, to set up API press Enter...")
 
         self.drone = DroneAPI()
         self.generator = ParameterGenerator(current_position=self.drone.current_position)
@@ -15,6 +18,7 @@ class DroneManager:
     
     def listen(self) -> None:
         while(True):
+            input("Press Enter to continue...")
             query = speech_to_text()
             
             if query is None:
@@ -26,7 +30,5 @@ class DroneManager:
             response = self.model.chat(prompt=prompt)
 
             print(response)
-            print()
 
             self.compiler.compile(instructions=response)
-            self.compiler.run()

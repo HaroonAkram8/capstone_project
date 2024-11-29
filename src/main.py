@@ -5,7 +5,7 @@ def main():
     with open("./system_prompts/llama3_1.txt", "r") as file:
         system_prompt = file.read()
 
-    drone = DroneManager(model=Models.LLAMA3, system_prompt=system_prompt)
+    drone = DroneManager(model=Models.LLAMA3_1, system_prompt=system_prompt)
     drone.listen()
 
 if __name__ == "__main__":
