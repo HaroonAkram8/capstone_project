@@ -15,10 +15,11 @@ class LLM:
         self.model_name = model.value
         self.system_prompt = {"role": "system", "content": system_prompt}
 
-    def chat(self, prompt: str):
+    def chat(self, prompt: str, temperature: float = 0.2):
         response = ollama.chat(
             model=self.model_name,
             messages=[self.system_prompt, {"role": "user", "content": prompt}],
+            options={"temperature": temperature},
             stream=False,
         )
 
