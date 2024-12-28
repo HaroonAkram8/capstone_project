@@ -5,6 +5,7 @@ from src.globals import DEFAULT_SYSTEM_PROMPT
 
 class Models(Enum):
     LLAMA3_1 = "llama3.1"
+    LLAMA3_1_70 = "llama3.1:70b"
     LLAMA3 = "llama3"
     PHI3_MINI = "phi3:mini"
 
