@@ -4,7 +4,7 @@ from src.llm.llm import Models
 def main(model: Models):
     "Takes a model and runs it with our system prompt"
     system_prompt = ""
-    with open("./system_prompts/llama3_1.txt", "r") as file:
+    with open("./system_prompts/default_system_prompt.txt", "r") as file:
         system_prompt = file.read().lower()
 
     drone = DroneManager(model=model, system_prompt=system_prompt)
