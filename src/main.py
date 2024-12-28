@@ -19,4 +19,4 @@ def run_phi3_mini():
     main(Models.PHI3_MINI)
 
 if __name__ == "__main__":
-    run_phi3_mini()
+    run_llama3_1()
