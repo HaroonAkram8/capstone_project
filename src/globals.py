@@ -11,13 +11,6 @@ LLAMA_3_BASE_CHECKPOINT = "meta-llama/Meta-Llama-3-8B"
 LLAMA_3_INSTRUCT_CHECKPOINT = "meta-llama/Meta-Llama-3-8B-Instruct"
 PHI_3_MINI_CHECKPOINT = "microsoft/Phi-3-mini-4k-instruct"
 
-# System Prompts
-DEFAULT_SYSTEM_PROMPT = {
-    "llama3.1": {"role": "system", "content": "You convert sentences into instructions for a drone. These are the possible drone instructions: UP, DOWN, LEFT, RIGHT, FORWARD, BACKWARD, ROTATE X (where X is the direction). Each instruction must be separated by a comma."},
-    "llama3": {"role": "system", "content": "You convert sentences into instructions for a drone. These are the possible drone instructions: UP, DOWN, LEFT, RIGHT, FORWARD, BACKWARD, ROTATE X (where X is the direction). Each instruction must be separated by a comma."},
-    "phi3:mini": {"role": "system", "content": "You convert sentences into instructions for a drone. These are the possible drone instructions: UP, DOWN, LEFT, RIGHT, FORWARD, BACKWARD, ROTATE X (where X is the direction). Each instruction must be separated by a comma."}
-}
-
 # Airsim Mapping Keys
 MOVE_POS = "position_move"
 MOVE_DIST = "distance_move"

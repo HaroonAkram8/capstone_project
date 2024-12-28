@@ -1,7 +1,6 @@
 import ollama
 from enum import Enum
 
-from src.globals import DEFAULT_SYSTEM_PROMPT
 
 class Models(Enum):
     LLAMA3_1 = "llama3.1"
