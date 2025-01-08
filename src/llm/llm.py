@@ -5,6 +5,7 @@ from enum import Enum
 class Models(Enum):
     LLAMA3_2 = "llama3.2"
     LLAMA3_1 = "llama3.1"
+    LLAMA3_1_70 = "llama3.1:70b"
     LLAMA3 = "llama3"
     PHI3_MINI = "phi3:mini"
 
