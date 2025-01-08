@@ -1,13 +1,11 @@
 from src.drone_manager import DroneManager
 from src.llm.llm import Models
 
-def main(model: Models):
-    "Takes a model and runs it with our system prompt"
-    system_prompt = ""
+def main():
     with open("./system_prompts/llama3_1.txt", "r") as file:
-        system_prompt = file.read().lower()
+        system_prompt = file.read()
 
-    drone = DroneManager(model=model, system_prompt=system_prompt)
+    drone = DroneManager(model=Models.LLAMA3_1, system_prompt=system_prompt)
     drone.listen()
 
 def run_phi3_mini():

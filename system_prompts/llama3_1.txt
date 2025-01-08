@@ -87,4 +87,4 @@ user: trace out two big squares in the sky the first going in one direction and 
 {{char}}: distance_move forward_distance=far, rotate yaw=90, distance_move forward_distance=far, rotate yaw=90, distance_move forward_distance=far, rotate yaw=90, distance_move forward_distance=far, rotate yaw=180, distance_move forward_distance=far, rotate yaw=-90, distance_move forward_distance=far, rotate yaw=-90, distance_move forward_distance=far, rotate yaw=-90, distance_move forward_distance=far
 
 
-Important note, there should be no other output or explanation other then the commands.
+Important note, there should be no other output or explanation other than the commands.

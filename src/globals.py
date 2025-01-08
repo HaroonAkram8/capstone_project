@@ -51,3 +51,47 @@ KEY_WORDS = {
     "INTERMEDIATE": 3, # time
     "LONG": 5, # time
 }
+
+# Airsim Mapping Keys
+MOVE_POS = "position_move"
+MOVE_DIST = "distance_move"
+MOVE_VEL = "velocity_move"
+ROTATE = "rotate"
+WAIT = "wait"
+TAKEOFF = "takeoff"
+LAND = "land"
+LOCATE = "locate"
+END = "end"
+
+CMD_KEY_WORDS = {
+    MOVE_POS: MOVE_POS,
+    MOVE_DIST: MOVE_DIST,
+    MOVE_VEL: MOVE_VEL,
+    ROTATE: ROTATE,
+    WAIT: WAIT,
+    TAKEOFF: TAKEOFF,
+    LAND: LAND,
+    LOCATE: LOCATE,
+    END: END,
+}
+
+# Instruction Splits
+INSTRUCTION_MARKER = ", "
+PARAMETER_MARKER = " "
+ASSIGNMENT_MARKER = "="
+
+# Default Drone Language Key Words
+KEY_WORDS = {
+    "slow": 1, # velocity
+    "moderate": 3, # velocity
+    "fast": 5, # velocity
+    "short": 1, # distance
+    "medium": 3, # distance
+    "far": 5, # distance
+    "quick": 1, # time
+    "intermediate": 3, # time
+    "long": 5, # time
+}
+
+# Separators
+DEBUG_SEPARATOR = "=" * 175
