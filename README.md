@@ -28,6 +28,7 @@ You need to have a local ollama server running to be able to continue. To do thi
 - Download: https://ollama.com/
 - Run a Llama3.2: `ollama run llama3.2`
 - Run a Llama3.1: `ollama run llama3.1`
+- Run a Llama3.1 70B: `ollama run llama3.1:70b`
 - Run a Llama3: `ollama run llama3`
 - Run a Phi3 Mini: `ollama run phi3:mini`
 
