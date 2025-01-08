@@ -1,3 +1,7 @@
 capstone_venv
 __pycache__
 models
+unsloth_setup/
+unfinished/
+test.py
+test2.py

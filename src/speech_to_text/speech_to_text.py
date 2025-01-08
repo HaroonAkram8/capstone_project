@@ -19,3 +19,8 @@ def speech_to_text() -> str:
             print("Did not catch that\n")
     
     return None
+
+# Example usage
+if __name__ == "__main__":
+    query = speech_to_text()
+    print(query)
