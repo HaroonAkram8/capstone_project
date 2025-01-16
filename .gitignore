@@ -3,8 +3,11 @@ __pycache__
 models
 unsloth_setup/
 unfinished/
-<<<<<<< HEAD
-=======
 test.py
 test2.py
->>>>>>> main
+test3.py
+test4.py
+choi/
+class.jpg
+room.jpg
+yolov8s-world.pt
