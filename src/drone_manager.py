@@ -49,6 +49,7 @@ class DroneManager(IDroneManager):
 
     def listen(self) -> None:
         while(True):
+            input("Press Enter to continue...")
             query = speech_to_text()
 
             if query is None:
