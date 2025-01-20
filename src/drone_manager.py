@@ -20,6 +20,7 @@ class TestDroneManager(IDroneManager):
 
     def listen(self) -> None:
         while(True):
+            input("Press Enter to continue...")
             query = speech_to_text()
 
             if query is None:
@@ -33,16 +34,19 @@ class TestDroneManager(IDroneManager):
             print(response)
             print()
 
-
 class DroneManager(IDroneManager):
     def __init__(self, model: Models, system_prompt: str) -> None:
         self.model = LLM(model=model, system_prompt=system_prompt)
+        #TODO: check if this chat is necessary or can go into the TestDroneManager class
+        self.model.chat(prompt="Hello world")
+
+        input("Model loaded, to set up API press Enter...")
 
         self.drone = DroneAPI()
         self.generator = ParameterGenerator(current_position=self.drone.current_position)
 
         self.compiler = Compiler(drone_api=self.drone, param_gen=self.generator)
-    
+
     def listen(self) -> None:
         while(True):
             query = speech_to_text()
@@ -52,13 +56,10 @@ class DroneManager(IDroneManager):
             if "stop listening" in query:
                 break
 
-            position = {"x": 5.0, "y": 7.0, "z": 3.0, "yaw": 34.0}
-            prompt = f"Drone State: {str(position)}\nMovement Instructions: {query}"
-            prompt = query
+            prompt = f"Drone State: {str(self.drone.current_position(in_degrees=True))}\nMovement Instructions: {query}"
             response = self.model.chat(prompt=prompt)
 
             print(response)
             print()
 
-            self.compiler.compile(instructions=response)
-            self.compiler.run()
+            self.compiler.compile(instructions=response, run=True)
