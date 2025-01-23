@@ -19,7 +19,7 @@ class Compiler():
             print(DEBUG_SEPARATOR)
 
         self.api_queue = deque()
-    
+
     def compile(self, instructions: str, run: bool=True):
         parser = ParameterParser(instructions=instructions)
         parser.parse()
@@ -49,7 +49,7 @@ class Compiler():
             if is_async:
                 func(**args).join()
                 continue
-            
+
             func(**args)
 
     def _add(self, cmd: str, params: dict):
@@ -57,7 +57,7 @@ class Compiler():
 
         if f is None:
             return
-        
+
         f_params = self.param_gen.generate(cmd=cmd, parameters=params)
         is_async = cmd != END
 
@@ -65,7 +65,7 @@ class Compiler():
 
         if self.debug:
             self._add_debug(cmd=cmd, params=params, f=f, f_params=f_params)
-    
+
     def _add_debug(self, cmd, params, f, f_params):
         log = {
             "input": {
@@ -79,21 +79,21 @@ class Compiler():
         }
 
         self.debug_logs.append(log)
-    
+
     def _execute_all(self):
         while self.api_queue:
             self._execute()
-    
+
     def _execute(self):
         if len(self.api_queue) == 0:
             return
-        
+
         func, args, is_async = self.api_queue.popleft()
 
         if is_async:
             func(**args).join()
             return
-        
+
         func(**args)
 
 # Example usage
@@ -104,7 +104,4 @@ if __name__ == "__main__":
     param_gen = ParameterGenerator(current_position=drone.current_position)
     compiler = Compiler(drone_api=drone, param_gen=param_gen, debug=True)
 
-    compiler.compile(instructions=example1)
-
-    # compiler.compile(instructions=example1, run=False)
-    # compiler.run()
+    compiler.compile(instructions=example1, run=True)

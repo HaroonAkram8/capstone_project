@@ -14,7 +14,7 @@ class ParameterParser():
         for instruct in self.instructions:
             command, parameters = self._split(instruction=instruct)
             self.commands.append((command, parameters))
-    
+
     def print_cmds(self):
         for c, p in self.commands:
             print(c)
@@ -27,16 +27,16 @@ class ParameterParser():
 
         if len(split_instruc) == 1:
             return command, {}
-        
+
         parameters = {}
         for param in split_instruc[1:]:
             if ASSIGNMENT_MARKER not in param:
                 return None, None
-            
+
             p, v = param.split(ASSIGNMENT_MARKER)
 
             parameters[p] = v.lower()
-        
+
         return command, parameters
 
 # Example usage
