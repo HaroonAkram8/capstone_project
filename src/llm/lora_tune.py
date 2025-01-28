@@ -18,6 +18,8 @@ from trl import SFTTrainer
 
 from transformers import AutoModelForCausalLM, AutoTokenizer, TrainingArguments, BitsAndBytesConfig
 
+# Reset before running script
+torch.cuda.empty_cache()
 """
 A simple example on using SFTTrainer and Accelerate to finetune Phi-3 models. For
 a more advanced example, please follow HF alignment-handbook/scripts/run_sft.py.
