@@ -12,7 +12,7 @@ from datasets import load_dataset
 from peft import LoraConfig
 import torch
 import transformers
-from trl import SFTTrainer
+from trl import SFTTrainer, SFTConfig
 
 # from src.globals import PHI_3_MINI_INSTRUCT_PATH
 
@@ -20,6 +20,7 @@ from transformers import AutoModelForCausalLM, AutoTokenizer, TrainingArguments,
 
 # Reset before running script
 torch.cuda.empty_cache()
+
 """
 A simple example on using SFTTrainer and Accelerate to finetune Phi-3 models. For
 a more advanced example, please follow HF alignment-handbook/scripts/run_sft.py.
@@ -69,12 +70,14 @@ Here is a sample config for deepspeed zero3:
 
 logger = logging.getLogger(__name__)
 
-
 ###################
 # Hyper-parameters
 ###################
 training_config = {
     "bf16": False,
+    "max_seq_length":2048,
+    "dataset_text_field":"text",
+    "packing":True,
     "do_eval": False,
     "learning_rate": 5.0e-06,
     "log_level": "info",
@@ -106,7 +109,7 @@ peft_config = {
     "target_modules": "all-linear",
     "modules_to_save": None,
 }
-train_conf = TrainingArguments(**training_config)
+train_conf = SFTConfig(**training_config)
 peft_conf = LoraConfig(**peft_config)
 
 
@@ -197,10 +200,7 @@ trainer = SFTTrainer(
     peft_config=peft_conf,
     train_dataset=processed_train_dataset,
     eval_dataset=processed_test_dataset,
-    max_seq_length=2048,
-    dataset_text_field="text",
-    tokenizer=tokenizer,
-    packing=True
+    processing_class=tokenizer,
 )
 train_result = trainer.train()
 metrics = train_result.metrics
