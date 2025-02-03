@@ -74,10 +74,10 @@ logger = logging.getLogger(__name__)
 # Hyper-parameters
 ###################
 training_config = {
-    "bf16": False,
     "max_seq_length":2048,
     "dataset_text_field":"text",
     "packing":True,
+    "bf16": True,
     "do_eval": False,
     "learning_rate": 5.0e-06,
     "log_level": "info",
@@ -88,8 +88,8 @@ training_config = {
     "max_steps": -1,
     "output_dir": "./checkpoint_dir",
     "overwrite_output_dir": True,
-    "per_device_eval_batch_size": 4,
-    "per_device_train_batch_size": 4,
+    "per_device_eval_batch_size": 1,
+    "per_device_train_batch_size": 1,
     "remove_unused_columns": True,
     "save_steps": 100,
     "save_total_limit": 1,
@@ -101,7 +101,7 @@ training_config = {
     }
 
 peft_config = {
-    "r": 16,
+    "r": 4,
     "lora_alpha": 32,
     "lora_dropout": 0.05,
     "bias": "none",
