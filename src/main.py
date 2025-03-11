@@ -5,7 +5,7 @@ def main():
     with open("./system_prompts/llama3_1.txt", "r") as file:
         system_prompt = file.read()
 
-    drone = DroneManager(model=Models.LLAMA3_1, system_prompt=system_prompt)
+    drone = DroneManager(llm_model=Models.LLAMA3_1, system_prompt=system_prompt)
     drone.listen()
 
 def run_phi3_mini():
