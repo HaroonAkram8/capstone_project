@@ -39,9 +39,9 @@ class DroneAPI():
                 img_np = np.frombuffer(responses[0].image_data_uint8, dtype=np.uint8)
                 rgb_img = cv2.imdecode(img_np, cv2.IMREAD_COLOR)
 
-                cv2.imshow("Drone Camera", rgb_img)
-                cv2.waitKey(0)
-                cv2.destroyAllWindows()
+                # cv2.imshow("Drone Camera", rgb_img)
+                # cv2.waitKey(0)
+                # cv2.destroyAllWindows()
 
             if responses[1].image_data_float:
                 depth_img = np.array(responses[1].image_data_float, dtype=np.float32)
