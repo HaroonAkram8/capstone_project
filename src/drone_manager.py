@@ -8,6 +8,8 @@ from src.compiler.compiler import Compiler
 
 from src.vision.vision import VisionModel
 
+from src.globals import TAKEOFF
+
 class DroneManager:
     def __init__(self, llm_model: Models, system_prompt: str, enable_speech: bool=True) -> None:
         self.enable_speech = enable_speech
@@ -58,7 +60,16 @@ class DroneManager:
         print(prompt)
         
         response = self.llm_model.chat(prompt=prompt)
+        response = self._land_state_handler(response=response)
         print(response)
 
         obj_loc = self.compiler.compile(instructions=response, vision_model=self.vision_model)
         return obj_loc
+    
+    def _land_state_handler(self, response: str):
+        drone_state = self.drone.current_position()
+
+        if drone_state["landed"] and not response.startswith(TAKEOFF):
+            response = TAKEOFF + ", " + response
+
+        return response

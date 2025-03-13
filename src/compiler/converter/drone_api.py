@@ -62,7 +62,8 @@ class DroneAPI():
             "x": position.x_val,
             "y": position.y_val,
             "z": position.z_val,
-            "yaw": airsim.to_eularian_angles(orientation)[2]
+            "yaw": airsim.to_eularian_angles(orientation)[2],
+            "landed": state.landed_state == airsim.LandedState.Landed,
         }
 
         if in_degrees:
