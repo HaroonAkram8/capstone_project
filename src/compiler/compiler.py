@@ -92,7 +92,7 @@ class Compiler():
             return
         
         f_params = self.param_gen.generate(cmd=cmd, parameters=params)
-        is_async = cmd != END
+        is_async = cmd != END or cmd != ROTATE
 
         self.api_queue.append((f, f_params, is_async))
 
