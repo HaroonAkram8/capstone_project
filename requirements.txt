@@ -1,5 +1,5 @@
 msgpack-rpc-python==0.4.1
-numpy==2.2.3
+numpy==2.1.1
 ollama==0.2.1
 PyAudio==0.2.14
 SpeechRecognition==3.10.4
