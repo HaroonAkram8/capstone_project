@@ -35,6 +35,7 @@ class DroneManager:
                 query = speech_to_text()
             else:
                 query = input("Awaiting written instructions...\n")
+                print()
             
             if query is None:
                 continue

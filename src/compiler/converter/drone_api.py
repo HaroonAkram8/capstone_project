@@ -28,7 +28,7 @@ class DroneAPI():
     
     def get_image(self):
         responses = self.client.simGetImages([
-            airsim.ImageRequest("0", airsim.ImageType.Scene, False, False),
+            airsim.ImageRequest("0", airsim.ImageType.Scene, False, True),
             airsim.ImageRequest("0", airsim.ImageType.DepthPerspective, True)
         ])
 
@@ -36,8 +36,12 @@ class DroneAPI():
 
         if responses:
             if responses[0].image_data_uint8:
-                img_np = np.frombuffer(airsim.string_to_uint8_array(responses[0]), dtype=np.uint8)
+                img_np = np.frombuffer(responses[0].image_data_uint8, dtype=np.uint8)
                 rgb_img = cv2.imdecode(img_np, cv2.IMREAD_COLOR)
+
+                cv2.imshow("Drone Camera", rgb_img)
+                cv2.waitKey(0)
+                cv2.destroyAllWindows()
 
             if responses[1].image_data_float:
                 depth_img = np.array(responses[1].image_data_float, dtype=np.float32)

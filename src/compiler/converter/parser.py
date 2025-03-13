@@ -16,7 +16,8 @@ class ParameterParser():
             command, parameters = self._split(instruction=instruct)
             
             if command == LOCATE:
-                self.locate_commands.append(parameters["object"])
+                obj = parameters["object"].strip('"')
+                self.locate_commands.append(obj)
                 continue
 
             self.commands.append((command, parameters))
