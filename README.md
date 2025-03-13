@@ -16,6 +16,7 @@ python3.11 -m venv ./capstone_venv   # create virtual environment for installing
 To install packages into your environment, run:
 
 ```
+pip install wheel
 pip install -r requirements.txt
 ```
 
