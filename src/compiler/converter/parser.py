@@ -1,18 +1,24 @@
 from src.globals import (
-    INSTRUCTION_MARKER, PARAMETER_MARKER, ASSIGNMENT_MARKER
+    INSTRUCTION_MARKER, PARAMETER_MARKER, ASSIGNMENT_MARKER, LOCATE
 )
 
 class ParameterParser():
     def __init__(self, instructions: str) -> None:
         self.instructions = instructions.split(INSTRUCTION_MARKER)
         self.commands = []
+        self.locate_commands = []
 
     def cmd_seq(self):
-        return self.commands
+        return self.commands, self.locate_commands
 
     def parse(self):
         for instruct in self.instructions:
             command, parameters = self._split(instruction=instruct)
+            
+            if command == LOCATE:
+                self.locate_commands.append(parameters["object"])
+                continue
+
             self.commands.append((command, parameters))
     
     def print_cmds(self):
@@ -20,6 +26,11 @@ class ParameterParser():
             print(c)
             for key in p:
                 print(f"\t{key}: {p[key]}")
+        
+        print()
+
+        for obj in self.locate_commands:
+            print(obj)
 
     def _split(self, instruction: str):
         split_instruc = instruction.split(PARAMETER_MARKER)
@@ -41,11 +52,12 @@ class ParameterParser():
 
 # Example usage
 if __name__ == "__main__":
-    example1 = "takeoff, move x=1 y=2 z=-3 v=4, rotate deg=87, position_move x=7 v=9, land object=table"
+    example1 = "takeoff, locate object=chair, move x=1 y=2 z=-3 v=4, rotate deg=87, position_move x=7 v=9, locate object=table"
 
     parser = ParameterParser(instructions=example1)
     parser.parse()
     parser.print_cmds()
 
-    cmds = parser.cmd_seq()
-    print(cmds)
+    commands, locate_commands = parser.cmd_seq()
+    print(commands)
+    print(locate_commands)

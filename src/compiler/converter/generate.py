@@ -120,7 +120,7 @@ class ParameterGenerator():
         if "velocity" in parameters:
             gen_p["velocity"] = self._get_val(parameter_value=parameters["velocity"])
         elif "duration" in parameters:
-            distance = self.distance_magnitude(curr_pos=curr_pos, gen_p=gen_p)
+            distance = self._distance_magnitude(curr_pos=curr_pos, gen_p=gen_p)
             gen_p["velocity"] = distance / self._get_val(parameter_value=parameters["duration"])
         else:
             gen_p["velocity"] = KEY_WORDS["moderate"]
@@ -131,7 +131,7 @@ class ParameterGenerator():
         velocity = pow(gen_p["vx"] ** 2 + gen_p["vy"] ** 2 + gen_p["vz"] ** 2, 0.5)
         return velocity
     
-    def distance_magnitude(self, curr_pos, gen_p):
+    def _distance_magnitude(self, curr_pos, gen_p):
         distance = pow((curr_pos["x"] - gen_p["x"]) ** 2 + (curr_pos["y"] - gen_p["y"]) ** 2 + (curr_pos["z"] - gen_p["z"]) ** 2, 0.5)
         return distance
 

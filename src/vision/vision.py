@@ -14,6 +14,13 @@ class VisionModel:
         self.locate = self._sim_locate
         if not simulation:
             self.locate = self._irl_locate
+    
+    def find_objects(self, image, classes: list=None):
+        results = self.predict(image=image, classes=classes)
+        self.parse_results(results=results)
+    
+    def get_object_states(self):
+        return self.object_states
 
     def predict(self, image, classes: list=None):
         if classes is not None:

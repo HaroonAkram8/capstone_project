@@ -4,7 +4,8 @@ from collections import deque
 from src.compiler.converter.drone_api import DroneAPI
 from src.compiler.converter.parser import ParameterParser
 from src.compiler.converter.generate import ParameterGenerator
-from src.globals import END, LOCATE, DEBUG_SEPARATOR
+from src.globals import END, DEBUG_SEPARATOR
+from src.vision.vision import VisionModel
 
 class Compiler():
     def __init__(self, drone_api: DroneAPI, param_gen: ParameterGenerator, debug: bool=False):
@@ -20,16 +21,48 @@ class Compiler():
 
         self.api_queue = deque()
     
-    def compile(self, instructions: str, run: bool=True):
+    def compile(self, instructions: str, run: bool=True, vision_model: VisionModel=None):
         parser = ParameterParser(instructions=instructions)
         parser.parse()
-        commands = parser.cmd_seq()
+        commands, locate_objects = parser.cmd_seq()
 
+        if len(locate_objects) == 0 or vision_model is None:
+            self._compile_commands(commands=commands, run=run)
+            return None
+        
+        object_states = vision_model.get_object_states()
+        all_found, obj_loc = self.get_object_locations(locate_objects=locate_objects, object_states=object_states)
+
+        num_rotations = 0
+
+        while not all_found and num_rotations < 3:
+            self.drone_api.rotate_n_deg(yaw_rate=90, duration=1)
+
+            rgb_img, depth_img = self.drone_api.get_image()
+            vision_model.find_objects(image=rgb_img, classes=locate_objects)
+            
+            object_states = vision_model.get_object_states()
+            all_found, obj_loc = self.get_object_locations(locate_objects=locate_objects, object_states=object_states)
+
+            num_rotations += 1
+        
+        self.drone_api.rotate_n_deg(yaw_rate=-90 * num_rotations, duration=num_rotations)
+        
+        return obj_loc
+
+    def get_object_locations(self, locate_objects, object_states):
+        obj_loc = {}
+
+        for obj in locate_objects:
+            if obj not in object_states:
+                return False, None
+            
+            obj_loc[obj] = object_states[obj].location
+        
+        return True, obj_loc
+
+    def _compile_commands(self, commands: list, run: bool):
         for c, p in commands:
-            if c == LOCATE:
-                # TODO: vision model implementation
-                continue
-
             self._add(cmd=c, params=p)
 
             if run:

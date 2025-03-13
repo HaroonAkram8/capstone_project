@@ -37,8 +37,19 @@ class DroneManager:
                 break
 
             prompt = f"Drone State: {str(self.drone.current_position(in_degrees=True))}\nMovement Instructions: {query}"
-            response = self.llm_model.chat(prompt=prompt)
+            obj_loc = self._compile_and_run(prompt=prompt)
 
-            print(response)
+            if obj_loc is None:
+                continue
 
-            self.compiler.compile(instructions=response)
+            prompt = f"Drone State: {str(self.drone.current_position(in_degrees=True))}\nObject Locations: {str(obj_loc)}\nMovement Instructions: {query}"
+            self._compile_and_run(prompt=prompt)
+    
+    def _compile_and_run(self, prompt: str):
+        print(prompt)
+        
+        response = self.llm_model.chat(prompt=prompt)
+        print(response)
+
+        obj_loc = self.compiler.compile(instructions=response, vision_model=self.vision_model)
+        return obj_loc
