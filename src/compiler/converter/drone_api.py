@@ -26,6 +26,12 @@ class DroneAPI():
             END: self.__end__,
         }
     
+    
+    def safe_land(self):
+        # In future, ensure landing space is large enough to support drone
+        self.client.landAsync().join()
+        self.__end__()
+
     def get_image(self):
         responses = self.client.simGetImages([
             airsim.ImageRequest("0", airsim.ImageType.Scene, False, True),

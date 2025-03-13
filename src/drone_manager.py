@@ -1,3 +1,6 @@
+import signal
+import sys
+
 from src.llm.llm import LLM, Models
 
 from src.speech_to_text.speech_to_text import speech_to_text
@@ -8,7 +11,7 @@ from src.compiler.compiler import Compiler
 
 from src.vision.vision import VisionModel
 
-from src.globals import TAKEOFF
+from src.globals import TAKEOFF, STOP
 
 class DroneManager:
     def __init__(self, llm_model: Models, system_prompt: str, enable_speech: bool=True) -> None:
@@ -24,6 +27,16 @@ class DroneManager:
         input("Vision Model loaded, press Enter to set up API...")
 
         self.drone = DroneAPI()
+        
+        def cleanup(signum, frame):
+            print(f"Received signal {signum}. Cleaning up and landing...")
+            self.drone.safe_land()
+            
+            sys.exit(0)
+
+        signal.signal(signal.SIGINT, cleanup)
+        signal.signal(signal.SIGTERM, cleanup)
+
         self.generator = ParameterGenerator(current_position=self.drone.current_position)
 
         self.compiler = Compiler(drone_api=self.drone, param_gen=self.generator)
@@ -41,7 +54,8 @@ class DroneManager:
             
             if query is None:
                 continue
-            if "stop listening" in query:
+            if STOP in query:
+                self.drone.safe_land()
                 break
 
             prompt = f"Drone State: {str(self.drone.current_position(in_degrees=True))}\nMovement Instructions: {query}"

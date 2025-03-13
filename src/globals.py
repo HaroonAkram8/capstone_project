@@ -1,3 +1,6 @@
+# Stop Drone Manager Instruction
+STOP = "stop drone"
+
 # Model Paths
 LLAMA_3_1_PATH = "./models/base_llama_3.1"
 LLAMA_3_PATH = "./models/base_llama_3"
