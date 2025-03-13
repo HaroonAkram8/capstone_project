@@ -9,7 +9,9 @@ from src.compiler.compiler import Compiler
 from src.vision.vision import VisionModel
 
 class DroneManager:
-    def __init__(self, llm_model: Models, system_prompt: str) -> None:
+    def __init__(self, llm_model: Models, system_prompt: str, enable_speech: bool=True) -> None:
+        self.enable_speech = enable_speech
+
         self.llm_model = LLM(model=llm_model, system_prompt=system_prompt)
         self.llm_model.chat(prompt="Hello world")
 
@@ -28,7 +30,11 @@ class DroneManager:
     
     def listen(self) -> None:
         while(True):
-            query = speech_to_text()
+            query = ""
+            if self.enable_speech:
+                query = speech_to_text()
+            else:
+                query = input("Awaiting written instructions...\n")
             
             if query is None:
                 continue

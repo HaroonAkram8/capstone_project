@@ -4,7 +4,7 @@ from collections import deque
 from src.compiler.converter.drone_api import DroneAPI
 from src.compiler.converter.parser import ParameterParser
 from src.compiler.converter.generate import ParameterGenerator
-from src.globals import END, DEBUG_SEPARATOR
+from src.globals import END, ROTATE, DEBUG_SEPARATOR
 from src.vision.vision import VisionModel
 
 class Compiler():
