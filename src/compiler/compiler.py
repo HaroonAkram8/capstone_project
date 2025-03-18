@@ -35,7 +35,7 @@ class Compiler():
 
         while not all_found and num_rotations < 4:
             rgb_img, depth_img = self.drone_api.get_image()
-            vision_model.find_objects(image=rgb_img, classes=locate_objects)
+            vision_model.find_objects(rgb_image=rgb_img, depth_image=depth_img, classes=locate_objects)
             
             object_states = vision_model.get_object_states()
             all_found, obj_loc = self.get_object_locations(locate_objects=locate_objects, object_states=object_states)
