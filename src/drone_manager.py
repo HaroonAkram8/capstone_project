@@ -64,12 +64,9 @@ class DroneManager:
             prompt = f"Drone State: {str(self.drone.current_position(in_degrees=True))}\nMovement Instructions: {query}"
             obj_loc = self._compile_and_run(prompt=prompt)
 
-            if obj_loc is None:
-                input("Press Enter to continue...")
-                continue
-
-            prompt = f"Drone State: {str(self.drone.current_position(in_degrees=True))}\nObject Locations: {str(obj_loc)}\nMovement Instructions: {query}"
-            self._compile_and_run(prompt=prompt)
+            if obj_loc is not None:
+                prompt = f"Drone State: {str(self.drone.current_position(in_degrees=True))}\nObject Locations: {str(obj_loc)}\nMovement Instructions: {query}"
+                self._compile_and_run(prompt=prompt)
 
             input("Press Enter to continue...")
     
