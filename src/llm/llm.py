@@ -7,7 +7,7 @@ class Models(Enum):
     LLAMA3_1_70 = "llama3.1:70b"
     LLAMA3 = "llama3"
     PHI3_MINI = "phi3:mini"
-    LLAMA3_2 = "deepseek-r1"
+    DEEPSEEK = "deepseek-r1"
 
 class LLM:
     def __init__(self, model: Models, system_prompt: str):
