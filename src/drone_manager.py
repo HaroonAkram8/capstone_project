@@ -1,5 +1,6 @@
 import signal
 import sys
+import re
 
 from src.llm.llm import LLM, Models
 
@@ -74,6 +75,7 @@ class DroneManager:
         print(prompt)
         
         response = self.llm_model.chat(prompt=prompt)
+        response = re.sub(r"<think>.*?</think>\n?", "", response, flags=re.DOTALL) 
         response = self._land_state_handler(response=response)
         print(response)
 
