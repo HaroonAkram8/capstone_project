@@ -61,8 +61,8 @@ class VisionModel:
                     self.object_states[obj.name] = obj
     
     def _sim_locate(self, depth_data, x_centre: int, y_centre: int):
-        location = self._relative_locate(depth_data=depth_data, x_centre=x_centre, y_centre=y_centre)
-        return location
+        relative_location = self._relative_locate(depth_data=depth_data, x_centre=x_centre, y_centre=y_centre)
+        return relative_location
     
     def _relative_locate(self, depth_data, x_centre: int, y_centre: int):
         fx, fy, cx, cy = self.camera_intrinsics
@@ -75,9 +75,9 @@ class VisionModel:
         Y = (y_centre - cy) * Z / fy
 
         return {
-            "relative_x": float(X),
-            "relative_y": float(Y),
-            "relative_z": float(Z)
+            "X": float(X),
+            "Y": float(Y),
+            "Z": float(Z)
         }
 
     def _irl_locate(self, depth_data, x_centre: int, y_centre: int):
