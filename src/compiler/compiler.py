@@ -40,10 +40,12 @@ class Compiler():
             object_states = vision_model.get_object_states()
             all_found, obj_loc = self.get_object_locations(locate_objects=locate_objects, object_states=object_states)
 
-            self.drone_api.rotate_n_deg(yaw_rate=90, duration=1)
-            num_rotations += 1
-        
-        self.drone_api.rotate_n_deg(yaw_rate=-90 * num_rotations, duration=num_rotations)
+            if not all_found:
+                self.drone_api.rotate_n_deg(yaw_rate=90, duration=1)
+                num_rotations += 1
+
+        if num_rotations > 0:
+            self.drone_api.rotate_n_deg(yaw_rate=-90 * num_rotations, duration=num_rotations)
         
         return obj_loc
 

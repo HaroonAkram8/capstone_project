@@ -48,6 +48,8 @@ class DroneManager:
     
     def listen(self) -> None:
         while(True):
+            print("-" * 75)
+
             query = ""
             if self.enable_speech:
                 query = speech_to_text()
@@ -65,6 +67,7 @@ class DroneManager:
             obj_loc = self._compile_and_run(prompt=prompt)
 
             if obj_loc is not None:
+                print()
                 prompt = f"Drone State: {str(self.drone.current_position(in_degrees=True))}\nObject Locations: {str(obj_loc)}\nMovement Instructions: {query}"
                 self._compile_and_run(prompt=prompt)
 

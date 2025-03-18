@@ -78,11 +78,6 @@ CMD_KEY_WORDS = {
     END: END,
 }
 
-# Instruction Splits
-INSTRUCTION_MARKER = ", "
-PARAMETER_MARKER = " "
-ASSIGNMENT_MARKER = "="
-
 # Default Drone Language Key Words
 KEY_WORDS = {
     "slow": 1, # velocity
