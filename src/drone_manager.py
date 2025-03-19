@@ -14,15 +14,17 @@ from src.vision.vision import VisionModel
 from src.globals import TAKEOFF, STOP
 
 class DroneManager:
-    def __init__(self, llm_model: Models, system_prompt: str, enable_speech: bool=True) -> None:
+    def __init__(self, llm_model: Models, system_prompt: str, enable_speech: bool=True, simulation: bool=True) -> None:
         self.enable_speech = enable_speech
+
+        print("Loading the Large Language Model...")
 
         self.llm_model = LLM(model=llm_model, system_prompt=system_prompt)
         self.llm_model.chat(prompt="Hello world")
 
         input("Large Language Model loaded, press Enter to set up Vision Model...")
 
-        self.vision_model = VisionModel()
+        self.vision_model = VisionModel(simulation=simulation)
 
         input("Vision Model loaded, press Enter to set up API...")
 
@@ -37,14 +39,17 @@ class DroneManager:
         signal.signal(signal.SIGINT, cleanup)
         signal.signal(signal.SIGTERM, cleanup)
 
-        self.generator = ParameterGenerator(current_position=self.drone.current_position)
+        self.vision_model.set_camera_intrinsics(camera_intrinsics=self.drone.get_camera_intrinsics())
 
+        self.generator = ParameterGenerator(current_position=self.drone.current_position)
         self.compiler = Compiler(drone_api=self.drone, param_gen=self.generator)
 
         input("API loaded, press Enter to start...")
     
     def listen(self) -> None:
         while(True):
+            print("-" * 75)
+
             query = ""
             if self.enable_speech:
                 query = speech_to_text()
@@ -61,12 +66,10 @@ class DroneManager:
             prompt = f"Drone State: {str(self.drone.current_position(in_degrees=True))}\nMovement Instructions: {query}"
             obj_loc = self._compile_and_run(prompt=prompt)
 
-            if obj_loc is None:
-                input("Press Enter to continue...")
-                continue
-
-            prompt = f"Drone State: {str(self.drone.current_position(in_degrees=True))}\nObject Locations: {str(obj_loc)}\nMovement Instructions: {query}"
-            self._compile_and_run(prompt=prompt)
+            if obj_loc is not None:
+                print()
+                prompt = f"Drone State: {str(self.drone.current_position(in_degrees=True))}\nObject Locations: {str(obj_loc)}\nMovement Instructions: {query}"
+                self._compile_and_run(prompt=prompt)
 
             input("Press Enter to continue...")
     
