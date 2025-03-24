@@ -147,7 +147,7 @@ model_kwargs = dict(
     trust_remote_code=True,
     attn_implementation="flash_attention_2",  # loading the model with flash-attenstion support
     torch_dtype=torch.bfloat16,
-    device_map=None
+    device_map="auto"
 )
 model = AutoModelForCausalLM.from_pretrained(checkpoint_path, **model_kwargs)
 tokenizer = AutoTokenizer.from_pretrained(checkpoint_path)
