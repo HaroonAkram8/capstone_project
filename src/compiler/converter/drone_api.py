@@ -72,7 +72,7 @@ class DroneAPI():
         self.client.rotateByYawRateAsync(yaw_rate, duration).join()
         self.client.rotateByYawRateAsync(0, 1).join()
     
-    def current_position(self, in_degrees: bool=False):
+    def current_position(self, in_degrees: bool=False, round_to_n: int=-1):
         state = self.client.getMultirotorState()
 
         position = state.kinematics_estimated.position
@@ -88,6 +88,12 @@ class DroneAPI():
 
         if in_degrees:
             position["yaw"] = math.degrees(position["yaw"])
+        
+        if round_to_n >= 0:
+            position["x"] = round(position["x"], round_to_n)
+            position["y"] = round(position["x"], round_to_n)
+            position["z"] = round(position["x"], round_to_n)
+            position["yaw"] = round(position["x"], round_to_n)
 
         return position
     
