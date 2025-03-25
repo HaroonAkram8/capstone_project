@@ -2,6 +2,9 @@ import math
 
 def sim_locate(depth_data, camera_intrinsics, x_centre: int, y_centre: int, curr_pos: dict):
     relative_location = _relative_locate(depth_data=depth_data, camera_intrinsics=camera_intrinsics, x_centre=x_centre, y_centre=y_centre)
+    if relative_location is None:
+        return None
+    
     location = _transform_location(relative_location=relative_location, curr_pos=curr_pos)
     return location
 
@@ -18,11 +21,11 @@ def _transform_location(relative_location: dict, curr_pos: dict):
 
     return location
 
-def _relative_locate(depth_data, camera_intrinsics, x_centre: int, y_centre: int):
+def _relative_locate(depth_data, camera_intrinsics, x_centre: int, y_centre: int, max_distance: int=50):
     fx, fy, cx, cy = camera_intrinsics
 
     Z = depth_data[y_centre, x_centre]
-    if Z == 0:
+    if Z == 0 or Z > max_distance:
         return None
 
     X = (x_centre - cx) * Z / fx

@@ -3,29 +3,32 @@ import random
 import numpy as np
 
 class Environment():
-    def __init__(self, max_x: int=100, max_y: int=100, max_z: int=25):
+    def __init__(self, max_x: int=100, max_y: int=100, max_z: int=10):
         self.x_offset = max_x
         self.y_offset = max_y
 
-        self.map = np.zeros(shape=(max_z + 1, self.y_offset + max_y + 1, self.x_offset + max_x + 1))
+        self.map = np.zeros(shape=(max_z, self.y_offset + max_y + 1, self.x_offset + max_x + 1))
 
         self.neighbors = [(0, 0, 1), (0, 0, -1), (0, 1, 0), (0, -1, 0), (1, 0, 0), (-1, 0, 0)]
     
     def set(self, val: int, x: int, y: int, z: int):
-        self.map[z][y + self.y_offset][x + self.x_offset] = val
+        self.map[z - 1][y + self.y_offset][x + self.x_offset] = val
     
     def get(self, x: int, y: int, z: int):
-        return self.map[z][y + self.y_offset][x + self.x_offset]
+        return self.map[z - 1][y + self.y_offset][x + self.x_offset]
     
     def get_path(self, start_pos: tuple, end_pos: tuple):
         x, y, z = start_pos
         x_g, y_g, z_g = end_pos
 
+        z = max(z, 1)
+        z_g = max(z_g, 1)
+
         if self.get(x_g, y_g, z_g) != 0:
             return None
         
-        start = (z, y + self.y_offset, x + self.x_offset)
-        goal = (z_g, y_g + self.y_offset, x_g + self.x_offset)
+        start = (z - 1, y + self.y_offset, x + self.x_offset)
+        goal = (z_g - 1, y_g + self.y_offset, x_g + self.x_offset)
 
         path = self._a_star(start=start, goal=goal)
         path = self._simplify_path(path=path)
