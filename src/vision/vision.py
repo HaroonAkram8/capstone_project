@@ -1,6 +1,6 @@
-import math
 from ultralytics import YOLOWorld
 
+from src.vision.locate import sim_locate, irl_locate
 from src.vision.object import Object
 
 class VisionModel:
@@ -14,9 +14,9 @@ class VisionModel:
 
         self.camera_intrinsics = camera_intrinsics
 
-        self.locate = self._sim_locate
+        self.locate = sim_locate
         if not simulation:
-            self.locate = self._irl_locate
+            self.locate = irl_locate
     
     def set_current_location(self, current_position):
         self.current_position = current_position
@@ -58,50 +58,13 @@ class VisionModel:
                 x_centre = int((x_min + x_max) / 2)
                 y_centre = int((y_min + y_max) / 2)
 
-                location = self.locate(depth_data=depth_data, x_centre=x_centre, y_centre=y_centre, curr_pos=curr_pos)
+                location = self.locate(depth_data=depth_data, camera_intrinsics=self.camera_intrinsics, x_centre=x_centre, y_centre=y_centre, curr_pos=curr_pos)
                 name = self.class_names[int(cls)]
 
                 obj = Object(name=name, confidence=confidence, location=location)
 
                 if obj.name not in self.object_states or self.object_states[obj.name].confidence < obj.confidence:
                     self.object_states[obj.name] = obj
-    
-    def _sim_locate(self, depth_data, x_centre: int, y_centre: int, curr_pos: dict):
-        relative_location = self._relative_locate(depth_data=depth_data, x_centre=x_centre, y_centre=y_centre)
-        location = self._transform_location(relative_location=relative_location, curr_pos=curr_pos)
-        return location
-    
-    def _transform_location(self, relative_location: dict, curr_pos: dict):
-        X = curr_pos["x"] + relative_location["x"] * math.sin(curr_pos["yaw"]) + relative_location["z"] * math.cos(curr_pos["yaw"])
-        Y = curr_pos["y"] + relative_location["x"] * math.cos(curr_pos["yaw"]) - relative_location["z"] * math.sin(curr_pos["yaw"])
-        Z = curr_pos["z"] - relative_location["y"] # z is negative
-
-        location = {
-            "x": round(X, 2),
-            "y": round(Y, 2),
-            "z": round(Z, 2)
-        }
-
-        return location
-    
-    def _relative_locate(self, depth_data, x_centre: int, y_centre: int):
-        fx, fy, cx, cy = self.camera_intrinsics
-
-        Z = depth_data[y_centre, x_centre]
-        if Z == 0:
-            return None
-
-        X = (x_centre - cx) * Z / fx
-        Y = (y_centre - cy) * Z / fy
-
-        return {
-            "x": float(X),
-            "y": float(Y),
-            "z": float(Z)
-        }
-
-    def _irl_locate(self, depth_data, x_centre: int, y_centre: int, curr_pos: dict):
-        pass
 
 if __name__ == "__main__":
     vision_model = VisionModel()
