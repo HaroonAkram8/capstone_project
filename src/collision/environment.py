@@ -28,8 +28,6 @@ class Environment():
         goal = (z_g, y_g + self.y_offset, x_g + self.x_offset)
 
         path = self._a_star(start=start, goal=goal)
-        print(path)
-        print()
         path = self._simplify_path(path=path)
 
         return path
@@ -109,11 +107,11 @@ class Environment():
                     if random.random() < 0.2:
                         self.map[z][y][x] = 1
 
+if __name__ == "__main__":
+    env = Environment()
+    env._set_rand_obstacles()
 
-env = Environment()
-env._set_rand_obstacles()
+    start = (-30, 20, 5)
+    goal = (10, -22, 5)
 
-start = (-30, 20, 5)
-goal = (10, -22, 5)
-
-print(env.get_path(start, goal))
+    print(env.get_path(start, goal))
