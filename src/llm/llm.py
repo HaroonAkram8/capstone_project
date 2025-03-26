@@ -7,6 +7,7 @@ class Models(Enum):
     LLAMA3_1_70 = "llama3.1:70b"
     LLAMA3 = "llama3"
     PHI3_MINI = "phi3:mini"
+    DEEPSEEK = "deepseek-r1"
     LLAMA_TUNED = "tzprogrammer/llama-drone"
 
 class LLM:
