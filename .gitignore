@@ -11,3 +11,9 @@ choi/
 class.jpg
 room.jpg
 yolov8s-world.pt
+venv/
+new_venv/
+environment.ply
+test5.py
+test6.py
+test7.py
