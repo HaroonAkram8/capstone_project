@@ -8,6 +8,7 @@ class Models(Enum):
     LLAMA3 = "llama3"
     PHI3_MINI = "phi3:mini"
     DEEPSEEK = "deepseek-r1"
+    LLAMA_TUNED = "tzprogrammer/llama-drone"
 
 class LLM:
     def __init__(self, model: Models, system_prompt: str):

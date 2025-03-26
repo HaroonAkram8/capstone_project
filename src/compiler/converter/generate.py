@@ -104,6 +104,9 @@ class ParameterGenerator():
             else:
                 value = 1
         
+        if value == 0:
+            value = 1
+
         return value
     
     def _distance(self, parameters, gen_p):
