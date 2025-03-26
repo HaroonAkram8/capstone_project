@@ -1,3 +1,4 @@
+import time
 import pprint
 from collections import deque
 
@@ -88,6 +89,7 @@ class Compiler():
                 continue
             
             func(**args)
+            time.sleep(1)
 
     def _add(self, cmd: str, params: dict):
         f = self.drone_api.get_function(cmd)
