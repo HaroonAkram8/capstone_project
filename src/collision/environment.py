@@ -26,7 +26,7 @@ class Environment():
     def get(self, x: int, y: int, z: int):
         return self.map[-z + 1][y + self.y_offset][x + self.x_offset]
     
-    def real_to_env(self, x: int, y: int, z: int):
+    def real_to_env(self, x, y, z):
         x = int(round(max(min(x + self.x_offset, self.x_offset * 2), -self.x_offset * 2)))
         y = int(round(max(min(y + self.y_offset, self.y_offset * 2), -self.y_offset * 2)))
         z = int(round(max(min(-z + 1, self.max_z - 1), 0)))
