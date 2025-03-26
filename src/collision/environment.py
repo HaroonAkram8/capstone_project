@@ -2,6 +2,7 @@ import heapq
 import random
 import numpy as np
 import pyvista as pv
+import pyvistaqt as pvqt
 
 class Environment():
     def __init__(self, max_x: int=100, max_y: int=100, max_z: int=10):
@@ -12,7 +13,11 @@ class Environment():
 
         self.neighbors = [(0, 0, 1), (0, 0, -1), (0, 1, 0), (0, -1, 0), (1, 0, 0), (-1, 0, 0)]
 
-        self.plotter = pv.Plotter()
+        self.plotter = pvqt.BackgroundPlotter()
+
+        self.ticker = 0
+        array = self.map.transpose(2, 1, 0)
+        self.obstacle_mesh = pv.ImageData(dimensions=np.array(array.shape) + 1)
     
     def set(self, val: int, x: int, y: int, z: int):
         self.map[z - 1][y + self.y_offset][x + self.x_offset] = val
@@ -21,12 +26,15 @@ class Environment():
         return self.map[z - 1][y + self.y_offset][x + self.x_offset]
     
     def visualize(self, current_position: tuple, spacing: float=1.0, cube_size: float=1.0):
+        self.plotter.view_isometric()
+        self.plotter.clear()
+        
         array = self.map.transpose(2, 1, 0)
 
-        grid = pv.ImageData(dimensions=np.array(array.shape) + 1)
-        grid.cell_data["values"] = array.flatten(order="F")
+        self.obstacle_mesh.overwrite(pv.ImageData(dimensions=np.array(array.shape) + 1))
+        self.obstacle_mesh.cell_data["values"] = array.flatten(order="F")
 
-        self.plotter.add_mesh(grid.threshold(0.5), color="red", show_edges=True, edge_color="black")
+        self.plotter.add_mesh(self.obstacle_mesh.threshold(0.5), color="red", show_edges=True, edge_color="black", name="mymesh")
 
         z, y, x = current_position["z"] + 0.5, current_position["y"] + 0.5, current_position["x"] + 0.5
 
@@ -35,9 +43,13 @@ class Environment():
         x += self.x_offset
 
         cube = pv.Cube(center=(x * spacing, y * spacing, z * spacing), x_length=cube_size, y_length=cube_size, z_length=cube_size)
+        
         self.plotter.add_mesh(cube, color='green', show_edges=True, edge_color="black")
 
-        self.plotter.show()
+        self.plotter.render()
+        self.plotter.app.processEvents()
+
+        self.ticker += 1
 
     def get_path(self, start_pos: tuple, end_pos: tuple):
         x, y, z = start_pos
@@ -133,8 +145,8 @@ class Environment():
                         self.map[z][y][x] = 1
 
 if __name__ == "__main__":
+    import time
     env = Environment(max_x=10, max_y=10, max_z=5)
-    env._set_rand_obstacles()
 
     current_position = {
         "x": 2,
@@ -142,7 +154,11 @@ if __name__ == "__main__":
         "z": 3
     }
 
-    env.visualize(current_position=current_position)
+    while True:
+        env._set_rand_obstacles()
+        env.visualize(current_position=current_position)
+
+        time.sleep(1)
 
     # start = (-30, 20, 5)
     # goal = (10, -22, 5)
