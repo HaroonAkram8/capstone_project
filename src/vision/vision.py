@@ -58,7 +58,7 @@ class VisionModel:
                 x_centre = int((x_min + x_max) / 2)
                 y_centre = int((y_min + y_max) / 2)
 
-                location = self.locate(depth_data=depth_data, camera_intrinsics=self.camera_intrinsics, x_centre=x_centre, y_centre=y_centre, curr_pos=curr_pos)
+                location, _ = self.locate(depth_data=depth_data, camera_intrinsics=self.camera_intrinsics, x_centre=x_centre, y_centre=y_centre, curr_pos=curr_pos)
                 name = self.class_names[int(cls)]
 
                 obj = Object(name=name, confidence=confidence, location=location)
