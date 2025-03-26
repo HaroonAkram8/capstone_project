@@ -86,6 +86,7 @@ class Compiler():
 
             if is_async:
                 func(**args).join()
+                time.sleep(1)
                 continue
             
             func(**args)
