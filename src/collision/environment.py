@@ -66,7 +66,7 @@ class Environment():
 
         self.ticker += 1
 
-    def get_path(self, start_pos: tuple, end_pos: tuple):
+    def get_path(self, start_pos: tuple, end_pos: tuple, to_real: bool=True):
         goal = self.real_to_env(x=end_pos[0], y=end_pos[1], z=end_pos[2])
         if self.map[goal[0]][goal[1]][goal[2]] != 0:
             return None
@@ -74,9 +74,20 @@ class Environment():
         start = self.real_to_env(x=start_pos[0], y=start_pos[1], z=start_pos[2])
 
         path = self._a_star(start=start, goal=goal)
+        if path is None:
+            return None
+        
         path = self._simplify_path(path=path)
 
-        return path
+        if not to_real:
+            return path
+        
+        converted_path = []
+        for point in path:
+            converted_point = self.env_to_real(z=point[0], y=point[1], x=point[2])
+            converted_path.append(converted_point)
+
+        return converted_path
     
     def _is_collinear(self, p1, p2, p3):
         v1 = np.array(p2) - np.array(p1)

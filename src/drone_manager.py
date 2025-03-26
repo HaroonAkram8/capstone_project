@@ -44,7 +44,7 @@ class DroneManager:
         self.vision_model.set_camera_intrinsics(camera_intrinsics=self.drone.get_camera_intrinsics())
 
         self.generator = ParameterGenerator(current_position=self.drone.current_position)
-        self.compiler = Compiler(drone_api=self.drone, param_gen=self.generator)
+        self.compiler = Compiler(drone_api=self.drone, param_gen=self.generator, simulation=simulation)
 
         input("API loaded, press Enter to start...")
     

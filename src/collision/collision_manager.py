@@ -14,6 +14,9 @@ class CollisionManager:
     
     def set_camera_intrinsics(self, camera_intrinsics):
         self.camera_intrinsics = camera_intrinsics
+
+    def get_path(self, start_pos: tuple, end_pos: tuple):
+        return self.env.get_path(start_pos=start_pos, end_pos=end_pos)
     
     def update_state(self, depth_data, curr_pos):
         for img_x in range(640):
