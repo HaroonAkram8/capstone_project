@@ -8,6 +8,7 @@ class Environment():
     def __init__(self, max_x: int=100, max_y: int=100, max_z: int=10):
         self.x_offset = max_x
         self.y_offset = max_y
+        self.max_z = max_z
 
         self.map = np.zeros(shape=(max_z, self.y_offset + max_y + 1, self.x_offset + max_x + 1))
 
@@ -24,6 +25,20 @@ class Environment():
     
     def get(self, x: int, y: int, z: int):
         return self.map[-z + 1][y + self.y_offset][x + self.x_offset]
+    
+    def real_to_env(self, x: int, y: int, z: int):
+        x = int(round(max(min(x + self.x_offset, self.x_offset * 2), -self.x_offset * 2)))
+        y = int(round(max(min(y + self.y_offset, self.y_offset * 2), -self.y_offset * 2)))
+        z = int(round(max(min(-z + 1, self.max_z - 1), 0)))
+
+        return z, y, x
+    
+    def env_to_real(self, z: int, y: int, x: int):
+        x -= self.x_offset
+        y -= self.y_offset
+        z = -z + 1
+
+        return x, y, z
     
     def visualize(self, current_position: tuple, spacing: float=1.0, cube_size: float=1.0):
         self.plotter.view_isometric()
@@ -52,17 +67,11 @@ class Environment():
         self.ticker += 1
 
     def get_path(self, start_pos: tuple, end_pos: tuple):
-        x, y, z = start_pos
-        x_g, y_g, z_g = end_pos
-
-        z = min(z, -1)
-        z_g = min(z_g, -1)
-
-        if self.get(x_g, y_g, z_g) != 0:
+        goal = self.real_to_env(x=end_pos[0], y=end_pos[1], z=end_pos[2])
+        if self.map[goal[0]][goal[1]][goal[2]] != 0:
             return None
         
-        start = (-z + 1, y + self.y_offset, x + self.x_offset)
-        goal = (-z_g + 1, y_g + self.y_offset, x_g + self.x_offset)
+        start = self.real_to_env(x=start_pos[0], y=start_pos[1], z=start_pos[2])
 
         path = self._a_star(start=start, goal=goal)
         path = self._simplify_path(path=path)
@@ -148,19 +157,23 @@ if __name__ == "__main__":
     import time
     env = Environment(max_x=10, max_y=10, max_z=5)
 
-    current_position = {
-        "x": 2,
-        "y": 10,
-        "z": -3
-    }
+    # current_position = {
+    #     "x": 2,
+    #     "y": 10,
+    #     "z": -3
+    # }
 
-    while True:
-        env._set_rand_obstacles()
-        env.visualize(current_position=current_position)
+    # while True:
+    #     env._set_rand_obstacles()
+    #     env.visualize(current_position=current_position)
 
-        time.sleep(1)
+    #     time.sleep(1)
 
-    # start = (-30, 20, 5)
-    # goal = (10, -22, 5)
+    env._set_rand_obstacles()
+    start = (9, 8, -3)
+    goal = (-4, 5, -3)
 
-    # print(env.get_path(start, goal))
+    print(env.real_to_env(x=goal[0], y=goal[1], z=goal[2]))
+    print(env.get_path(start, goal))
+
+    print(env.env_to_real(x=6, y=15, z=4))
