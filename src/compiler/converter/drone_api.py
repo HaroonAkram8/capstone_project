@@ -32,7 +32,7 @@ class DroneAPI():
 
     def _startup_sequence(self,):
         self.client.takeoffAsync().join()
-        time.sleep(1)
+        time.sleep(2)
     
     def get_camera_intrinsics(self,):
         return self.camera_intrinsics
@@ -71,6 +71,14 @@ class DroneAPI():
             if responses[1].image_data_float:
                 depth_img = np.array(responses[1].image_data_float, dtype=np.float32)
                 depth_img = depth_img.reshape((responses[1].height, responses[1].width))
+
+                # depth = cv2.normalize(depth_img, None, 0, 255, cv2.NORM_MINMAX)
+                # depth = np.uint8(depth)
+                # depth = cv2.applyColorMap(depth, cv2.COLORMAP_JET)
+
+                # cv2.imshow("Depth Map", depth)
+                # cv2.waitKey(0)
+                # cv2.destroyAllWindows()
         
         return rgb_img, depth_img
     

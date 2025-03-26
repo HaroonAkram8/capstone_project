@@ -12,7 +12,7 @@ class Environment():
 
         self.map = np.zeros(shape=(max_z, self.y_offset + max_y + 1, self.x_offset + max_x + 1))
 
-        self.neighbors = [(0, 0, 1), (0, 0, -1), (0, 1, 0), (0, -1, 0), (1, 0, 0), (-1, 0, 0)]
+        self.neighbors = [(0, 0, 1), (0, 0, -1), (0, 1, 0), (0, -1, 0), (1, 0, 0)] #, (-1, 0, 0)]
 
         self.plotter = pvqt.BackgroundPlotter()
 
@@ -27,8 +27,8 @@ class Environment():
         return self.map[-z + 1][y + self.y_offset][x + self.x_offset]
     
     def real_to_env(self, x, y, z):
-        x = int(round(max(min(x + self.x_offset, self.x_offset * 2), -self.x_offset * 2)))
-        y = int(round(max(min(y + self.y_offset, self.y_offset * 2), -self.y_offset * 2)))
+        x = int(round(max(min(x + self.x_offset, self.x_offset * 2), 0)))
+        y = int(round(max(min(y + self.y_offset, self.y_offset * 2), 0)))
         z = int(round(max(min(-z + 1, self.max_z - 1), 0)))
 
         return z, y, x
@@ -166,7 +166,7 @@ class Environment():
 
 if __name__ == "__main__":
     import time
-    env = Environment(max_x=10, max_y=10, max_z=5)
+    env = Environment()
 
     # current_position = {
     #     "x": 2,
@@ -181,10 +181,14 @@ if __name__ == "__main__":
     #     time.sleep(1)
 
     env._set_rand_obstacles()
-    start = (9, 8, -3)
-    goal = (-4, 5, -3)
+    start = (0, 0, -1)
+    goal = (-20, 0, -1)
 
-    print(env.real_to_env(x=goal[0], y=goal[1], z=goal[2]))
-    print(env.get_path(start, goal))
+    # print(env.real_to_env(x=goal[0], y=goal[1], z=goal[2]))
+    # print(env.get_path(start, goal))
 
-    print(env.env_to_real(x=6, y=15, z=4))
+    print(goal)
+    goal_env = env.real_to_env(x=goal[0], y=goal[1], z=goal[2])
+    print(goal_env)
+    real_goal = env.env_to_real(x=goal_env[2], y=goal_env[1], z=goal_env[0])
+    print(real_goal)

@@ -25,16 +25,15 @@ class Compiler():
 
         self.collision_avoidance = collision_avoidance
         if self.collision_avoidance:
-            self.collision_manager = CollisionManager(simulation=simulation, camera_intrinsics=drone_api.get_camera_intrinsics(), max_x=10, max_y=10, max_z=5)
+            self.collision_manager = CollisionManager(simulation=simulation, camera_intrinsics=drone_api.get_camera_intrinsics(), max_x=100, max_y=100, max_z=20)
             self._startup_sequence()
 
     def _startup_sequence(self,):
         for i in range(4):
             _, depth_img = self.drone_api.get_image()
             self.collision_manager.update_state(depth_data=depth_img, curr_pos=self.drone_api.current_position())
+            break
             self.drone_api.rotate_n_deg(yaw_rate=90, duration=1)
-        
-        self.drone_api.rotate_n_deg(yaw_rate=90, duration=1)
 
     def compile(self, instructions: str, run: bool=True, vision_model: VisionModel=None):
         parser = ParameterParser(instructions=instructions)
@@ -50,7 +49,7 @@ class Compiler():
 
         while not all_found and num_rotations < 4:
             rgb_img, depth_img = self.drone_api.get_image()
-            
+
             if self.collision_avoidance:
                 self.collision_manager.update_state(depth_data=depth_img, curr_pos=self.drone_api.current_position())
 
@@ -121,12 +120,13 @@ class Compiler():
         if len(path) > 1:
             f = self.drone_api.get_function(MOVE_POS)
             
-            for location in path:
-                f_params['x'] = location[0]
-                f_params['y'] = location[0]
-                f_params['z'] = location[0]
+            for loc in path:
+                temp_params = f_params.copy()
+                temp_params['x'] = loc[0]
+                temp_params['y'] = loc[1]
+                temp_params['z'] = loc[2]
 
-                self.api_queue.append((f, f_params, True))
+                self.api_queue.append((f, temp_params, True))
         else:
             self.api_queue.append((f, f_params, is_async))
 
@@ -174,13 +174,13 @@ class Compiler():
 
 # Example usage
 if __name__ == "__main__":
-    example1 = "TAKEOFF, ROTATE yaw=75 duration=3, DISTANCE_MOVE forward_distance=3, LAND"
+    example1 = "DISTANCE_MOVE forward_distance=20"
 
     drone = DroneAPI()
+    vision_model = VisionModel()
+
     param_gen = ParameterGenerator(current_position=drone.current_position)
-    compiler = Compiler(drone_api=drone, param_gen=param_gen, debug=True)
-
-    compiler.compile(instructions=example1)
-
+    compiler = Compiler(drone_api=drone, param_gen=param_gen, debug=False)
+    compiler.compile(instructions=example1, vision_model=vision_model)
     # compiler.compile(instructions=example1, run=False)
     # compiler.run()
