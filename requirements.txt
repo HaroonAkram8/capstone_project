@@ -7,3 +7,6 @@ transformers==4.41.2
 opencv-python==4.11.0.86
 airsim==1.8.1
 ultralytics==8.3.89
+pyvista==0.42.3
+pyvistaqt==0.11.2
+pyqt5-tools==5.15.9.3.3

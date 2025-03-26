@@ -1,12 +1,12 @@
 import math
 
 def sim_locate(depth_data, camera_intrinsics, x_centre: int, y_centre: int, curr_pos: dict):
-    relative_location = _relative_locate(depth_data=depth_data, camera_intrinsics=camera_intrinsics, x_centre=x_centre, y_centre=y_centre)
+    relative_location, is_max = _relative_locate(depth_data=depth_data, camera_intrinsics=camera_intrinsics, x_centre=x_centre, y_centre=y_centre)
     if relative_location is None:
         return None
     
     location = _transform_location(relative_location=relative_location, curr_pos=curr_pos)
-    return location
+    return location, is_max
 
 def _transform_location(relative_location: dict, curr_pos: dict):
     X = curr_pos["x"] + relative_location["x"] * math.sin(curr_pos["yaw"]) + relative_location["z"] * math.cos(curr_pos["yaw"])
@@ -24,9 +24,9 @@ def _transform_location(relative_location: dict, curr_pos: dict):
 def _relative_locate(depth_data, camera_intrinsics, x_centre: int, y_centre: int, max_distance: int=50):
     fx, fy, cx, cy = camera_intrinsics
 
-    Z = depth_data[y_centre, x_centre]
-    if Z == 0 or Z > max_distance:
-        return None
+    Z = min(depth_data[y_centre, x_centre], max_distance)
+    if Z == 0:
+        return None, False
 
     X = (x_centre - cx) * Z / fx
     Y = (y_centre - cy) * Z / fy
@@ -35,7 +35,7 @@ def _relative_locate(depth_data, camera_intrinsics, x_centre: int, y_centre: int
         "x": float(X),
         "y": float(Y),
         "z": float(Z)
-    }
+    }, Z == max_distance
 
 def irl_locate(depth_data, x_centre: int, y_centre: int, curr_pos: dict):
     pass

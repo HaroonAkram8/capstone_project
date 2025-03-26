@@ -15,7 +15,7 @@ from src.vision.vision import VisionModel
 from src.globals import TAKEOFF, STOP, LOCATE
 
 class DroneManager:
-    def __init__(self, llm_model: Models, system_prompt: str, enable_speech: bool=True, simulation: bool=True) -> None:
+    def __init__(self, llm_model: Models, system_prompt: str, enable_speech: bool=True, simulation: bool=True, collision_avoidance: bool=True) -> None:
         self.enable_speech = enable_speech
 
         print("Loading the Large Language Model...")
@@ -44,7 +44,7 @@ class DroneManager:
         self.vision_model.set_camera_intrinsics(camera_intrinsics=self.drone.get_camera_intrinsics())
 
         self.generator = ParameterGenerator(current_position=self.drone.current_position)
-        self.compiler = Compiler(drone_api=self.drone, param_gen=self.generator)
+        self.compiler = Compiler(drone_api=self.drone, param_gen=self.generator, simulation=simulation, collision_avoidance=collision_avoidance)
 
         input("API loaded, press Enter to start...")
     
