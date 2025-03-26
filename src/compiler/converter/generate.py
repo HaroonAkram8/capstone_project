@@ -18,6 +18,10 @@ class ParameterGenerator():
             return parameters
         
         gen_p = self.mappings[cmd](parameters=parameters)
+
+        for key in gen_p:
+            gen_p[key] = round(gen_p[key], 2)
+
         return gen_p
     
     def _wait(self, parameters):
@@ -149,13 +153,11 @@ if __name__ == "__main__":
         }
 
     example1 = {
-        "forward_velocity": '7',
-        "right_velocity": '4',
-        "up_velocity": '5',
-        "duration": '2'
+        "right_distance": '7',
+        "velocity": '4',
     }
 
     generator = ParameterGenerator(current_position=test_position)
 
-    gen_p = generator.generate(cmd=MOVE_VEL, parameters=example1)
+    gen_p = generator.generate(cmd=MOVE_DIST, parameters=example1)
     print(gen_p)
