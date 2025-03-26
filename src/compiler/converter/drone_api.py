@@ -91,9 +91,9 @@ class DroneAPI():
         
         if round_to_n >= 0:
             position["x"] = round(position["x"], round_to_n)
-            position["y"] = round(position["x"], round_to_n)
-            position["z"] = round(position["x"], round_to_n)
-            position["yaw"] = round(position["x"], round_to_n)
+            position["y"] = round(position["y"], round_to_n)
+            position["z"] = round(position["z"], round_to_n)
+            position["yaw"] = round(position["yaw"], round_to_n)
 
         return position
     
