@@ -11,7 +11,7 @@ from src.compiler.compiler import Compiler
 
 from src.vision.vision import VisionModel
 
-from src.globals import TAKEOFF, STOP
+from src.globals import TAKEOFF, STOP, LOCATE
 
 class DroneManager:
     def __init__(self, llm_model: Models, system_prompt: str, enable_speech: bool=True, simulation: bool=True) -> None:
@@ -39,6 +39,7 @@ class DroneManager:
         signal.signal(signal.SIGINT, cleanup)
         signal.signal(signal.SIGTERM, cleanup)
 
+        self.vision_model.set_current_location(current_position=self.drone.current_position)
         self.vision_model.set_camera_intrinsics(camera_intrinsics=self.drone.get_camera_intrinsics())
 
         self.generator = ParameterGenerator(current_position=self.drone.current_position)
@@ -62,23 +63,27 @@ class DroneManager:
             if STOP in query:
                 self.drone.safe_land()
                 break
-
-            prompt = f"Drone State: {str(self.drone.current_position(in_degrees=True))}\nMovement Instructions: {query}"
+            
+            curr_pos = self.drone.current_position(in_degrees=True, round_to_n=2)
+            prompt = f"Drone State: {str(curr_pos)}\nMovement Instructions: {query}"
             obj_loc = self._compile_and_run(prompt=prompt)
 
             if obj_loc is not None:
                 print()
-                prompt = f"Drone State: {str(self.drone.current_position(in_degrees=True))}\nObject Locations: {str(obj_loc)}\nMovement Instructions: {query}"
-                self._compile_and_run(prompt=prompt)
+                prompt = f"Drone State: {str(curr_pos)}\nObject Locations: {str(obj_loc)}\nMovement Instructions: {query}"
+                self._compile_and_run(prompt=prompt, locate=False)
 
             input("Press Enter to continue...")
     
-    def _compile_and_run(self, prompt: str):
+    def _compile_and_run(self, prompt: str, locate: bool=True):
         print(prompt)
         
         response = self.llm_model.chat(prompt=prompt)
         response = self._land_state_handler(response=response)
         print(response)
+
+        if not locate and LOCATE in response:
+            return None
 
         obj_loc = self.compiler.compile(instructions=response, vision_model=self.vision_model)
         return obj_loc
