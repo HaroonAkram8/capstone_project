@@ -24,7 +24,17 @@ class Compiler():
         self.api_queue = deque()
 
         self.collision_manager = CollisionManager(simulation=simulation, camera_intrinsics=drone_api.get_camera_intrinsics(), max_x=10, max_y=10, max_z=5)
-    
+
+        self._startup_sequence()
+
+    def _startup_sequence(self,):
+        for i in range(4):
+            _, depth_img = self.drone_api.get_image()
+            self.collision_manager.update_state(depth_data=depth_img, curr_pos=self.drone_api.current_position())
+            self.drone_api.rotate_n_deg(yaw_rate=90, duration=1)
+        
+        self.drone_api.rotate_n_deg(yaw_rate=90, duration=1)
+
     def compile(self, instructions: str, run: bool=True, vision_model: VisionModel=None):
         parser = ParameterParser(instructions=instructions)
         parser.parse()

@@ -27,6 +27,12 @@ class DroneAPI():
             WAIT: self.__wait__,
             END: self.__end__,
         }
+
+        self._startup_sequence()
+
+    def _startup_sequence(self,):
+        self.client.takeoffAsync().join()
+        time.sleep(1)
     
     def get_camera_intrinsics(self,):
         return self.camera_intrinsics
@@ -71,6 +77,7 @@ class DroneAPI():
     def rotate_n_deg(self, yaw_rate, duration):
         self.client.rotateByYawRateAsync(yaw_rate, duration).join()
         self.client.rotateByYawRateAsync(0, 1).join()
+        time.sleep(1)
     
     def current_position(self, in_degrees: bool=False, round_to_n: int=-1):
         state = self.client.getMultirotorState()
