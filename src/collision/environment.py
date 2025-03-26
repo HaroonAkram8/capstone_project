@@ -1,6 +1,7 @@
 import heapq
 import random
 import numpy as np
+import pyvista as pv
 
 class Environment():
     def __init__(self, max_x: int=100, max_y: int=100, max_z: int=10):
@@ -10,6 +11,8 @@ class Environment():
         self.map = np.zeros(shape=(max_z, self.y_offset + max_y + 1, self.x_offset + max_x + 1))
 
         self.neighbors = [(0, 0, 1), (0, 0, -1), (0, 1, 0), (0, -1, 0), (1, 0, 0), (-1, 0, 0)]
+
+        self.plotter = pv.Plotter()
     
     def set(self, val: int, x: int, y: int, z: int):
         self.map[z - 1][y + self.y_offset][x + self.x_offset] = val
@@ -17,6 +20,25 @@ class Environment():
     def get(self, x: int, y: int, z: int):
         return self.map[z - 1][y + self.y_offset][x + self.x_offset]
     
+    def visualize(self, current_position: tuple, spacing: float=1.0, cube_size: float=1.0):
+        array = self.map.transpose(2, 1, 0)
+
+        grid = pv.ImageData(dimensions=np.array(array.shape) + 1)
+        grid.cell_data["values"] = array.flatten(order="F")
+
+        self.plotter.add_mesh(grid.threshold(0.5), color="red", show_edges=True, edge_color="black")
+
+        z, y, x = current_position["z"] + 0.5, current_position["y"] + 0.5, current_position["x"] + 0.5
+
+        z -= 1
+        y += self.y_offset
+        x += self.x_offset
+
+        cube = pv.Cube(center=(x * spacing, y * spacing, z * spacing), x_length=cube_size, y_length=cube_size, z_length=cube_size)
+        self.plotter.add_mesh(cube, color='green', show_edges=True, edge_color="black")
+
+        self.plotter.show()
+
     def get_path(self, start_pos: tuple, end_pos: tuple):
         x, y, z = start_pos
         x_g, y_g, z_g = end_pos
@@ -107,14 +129,22 @@ class Environment():
         for x in range(x_max):
             for y in range(y_max):
                 for z in range(z_max):
-                    if random.random() < 0.2:
+                    if random.random() < 0.1:
                         self.map[z][y][x] = 1
 
 if __name__ == "__main__":
-    env = Environment()
+    env = Environment(max_x=10, max_y=10, max_z=5)
     env._set_rand_obstacles()
 
-    start = (-30, 20, 5)
-    goal = (10, -22, 5)
+    current_position = {
+        "x": 2,
+        "y": 10,
+        "z": 3
+    }
 
-    print(env.get_path(start, goal))
+    env.visualize(current_position=current_position)
+
+    # start = (-30, 20, 5)
+    # goal = (10, -22, 5)
+
+    # print(env.get_path(start, goal))
