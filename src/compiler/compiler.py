@@ -10,7 +10,7 @@ from src.vision.vision import VisionModel
 from src.collision.collision_manager import CollisionManager
 
 class Compiler():
-    def __init__(self, drone_api: DroneAPI, param_gen: ParameterGenerator, debug: bool=False, simulation: bool=True):
+    def __init__(self, drone_api: DroneAPI, param_gen: ParameterGenerator, debug: bool=False, simulation: bool=True, collision_avoidance: bool=True):
         self.drone_api = drone_api
         self.param_gen = param_gen
         self.debug = debug
@@ -23,9 +23,10 @@ class Compiler():
 
         self.api_queue = deque()
 
-        self.collision_manager = CollisionManager(simulation=simulation, camera_intrinsics=drone_api.get_camera_intrinsics(), max_x=10, max_y=10, max_z=5)
-
-        self._startup_sequence()
+        self.collision_avoidance = collision_avoidance
+        if self.collision_avoidance:
+            self.collision_manager = CollisionManager(simulation=simulation, camera_intrinsics=drone_api.get_camera_intrinsics(), max_x=10, max_y=10, max_z=5)
+            self._startup_sequence()
 
     def _startup_sequence(self,):
         for i in range(4):
@@ -49,7 +50,9 @@ class Compiler():
 
         while not all_found and num_rotations < 4:
             rgb_img, depth_img = self.drone_api.get_image()
-            self.collision_manager.update_state(depth_data=depth_img, curr_pos=self.drone_api.current_position())
+            
+            if self.collision_avoidance:
+                self.collision_manager.update_state(depth_data=depth_img, curr_pos=self.drone_api.current_position())
 
             vision_model.find_objects(rgb_image=rgb_img, depth_image=depth_img, classes=locate_objects)
             
@@ -112,7 +115,7 @@ class Compiler():
         is_async = cmd != END and cmd != ROTATE
 
         path = []
-        if cmd in [MOVE_POS, MOVE_DIST, MOVE_VEL]:
+        if self.collision_avoidance and cmd in [MOVE_POS, MOVE_DIST, MOVE_VEL]:
             path = self._get_path(goal_position=f_params)
 
         if len(path) > 1:
