@@ -1,14 +1,16 @@
+import time
 import pprint
 from collections import deque
 
 from src.compiler.converter.drone_api import DroneAPI
 from src.compiler.converter.parser import ParameterParser
 from src.compiler.converter.generate import ParameterGenerator
-from src.globals import END, ROTATE, DEBUG_SEPARATOR
+from src.globals import END, ROTATE, DEBUG_SEPARATOR, MOVE_POS, MOVE_DIST, MOVE_VEL
 from src.vision.vision import VisionModel
+from src.collision.collision_manager import CollisionManager
 
 class Compiler():
-    def __init__(self, drone_api: DroneAPI, param_gen: ParameterGenerator, debug: bool=False):
+    def __init__(self, drone_api: DroneAPI, param_gen: ParameterGenerator, debug: bool=False, simulation: bool=True):
         self.drone_api = drone_api
         self.param_gen = param_gen
         self.debug = debug
@@ -20,6 +22,8 @@ class Compiler():
             print(DEBUG_SEPARATOR)
 
         self.api_queue = deque()
+
+        self.collision_manager = CollisionManager(simulation=simulation, camera_intrinsics=drone_api.get_camera_intrinsics(), max_x=10, max_y=10, max_z=5)
     
     def compile(self, instructions: str, run: bool=True, vision_model: VisionModel=None):
         parser = ParameterParser(instructions=instructions)
@@ -35,6 +39,8 @@ class Compiler():
 
         while not all_found and num_rotations < 4:
             rgb_img, depth_img = self.drone_api.get_image()
+            self.collision_manager.update_state(depth_data=depth_img, curr_pos=self.drone_api.current_position())
+
             vision_model.find_objects(rgb_image=rgb_img, depth_image=depth_img, classes=locate_objects)
             
             object_states = vision_model.get_object_states()
@@ -80,9 +86,11 @@ class Compiler():
 
             if is_async:
                 func(**args).join()
+                time.sleep(1)
                 continue
             
             func(**args)
+            time.sleep(1)
 
     def _add(self, cmd: str, params: dict):
         f = self.drone_api.get_function(cmd)
@@ -93,11 +101,34 @@ class Compiler():
         f_params = self.param_gen.generate(cmd=cmd, parameters=params)
         is_async = cmd != END and cmd != ROTATE
 
-        self.api_queue.append((f, f_params, is_async))
+        path = []
+        if cmd in [MOVE_POS, MOVE_DIST, MOVE_VEL]:
+            path = self._get_path(goal_position=f_params)
+
+        if len(path) > 1:
+            f = self.drone_api.get_function(MOVE_POS)
+            
+            for location in path:
+                f_params['x'] = location[0]
+                f_params['y'] = location[0]
+                f_params['z'] = location[0]
+
+                self.api_queue.append((f, f_params, True))
+        else:
+            self.api_queue.append((f, f_params, is_async))
 
         if self.debug:
             self._add_debug(cmd=cmd, params=params, f=f, f_params=f_params)
     
+    def _get_path(self, goal_position: dict):
+        curr_pos = self.drone_api.current_position()
+
+        start_pos = (curr_pos['x'], curr_pos['y'], curr_pos['z'])
+        end_pos = (goal_position['x'], goal_position['y'], goal_position['z'])
+
+        path = self.collision_manager.get_path(start_pos=start_pos, end_pos=end_pos)
+        return path
+
     def _add_debug(self, cmd, params, f, f_params):
         log = {
             "input": {
