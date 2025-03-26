@@ -98,7 +98,6 @@ class Compiler():
         f_params = self.param_gen.generate(cmd=cmd, parameters=params)
         is_async = cmd != END and cmd != ROTATE
 
-        # HERE
         path = []
         if cmd in [MOVE_POS, MOVE_DIST, MOVE_VEL]:
             path = self._get_path(goal_position=f_params)
@@ -111,7 +110,7 @@ class Compiler():
                 f_params['y'] = location[0]
                 f_params['z'] = location[0]
 
-                self.api_queue.append((f, f_params, is_async))
+                self.api_queue.append((f, f_params, True))
         else:
             self.api_queue.append((f, f_params, is_async))
 
