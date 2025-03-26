@@ -32,7 +32,6 @@ class Compiler():
         for i in range(4):
             _, depth_img = self.drone_api.get_image()
             self.collision_manager.update_state(depth_data=depth_img, curr_pos=self.drone_api.current_position())
-            break
             self.drone_api.rotate_n_deg(yaw_rate=90, duration=1)
 
     def compile(self, instructions: str, run: bool=True, vision_model: VisionModel=None):
