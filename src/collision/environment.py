@@ -204,6 +204,12 @@ if __name__ == "__main__":
 
     goal_pos = [{"x": 10, "y": -4, "z": -2}, {"x": 5, "y": 5, "z": -3}, {"x": -8, "y": 5, "z": -4}, {"x": -7, "y": 4, "z": -1}, {"x": 9, "y": -8, "z": -3}]
 
+    env.visualize(current_position=current_position, goal_pos=goal_pos[0])
+    time.sleep(10)
+
+    env.visualize(current_position=current_position, goal_pos=goal_pos[0])
+    time.sleep(10)
+
     for i in range(len(goal_pos)):
         env.visualize(current_position=current_position, goal_pos=goal_pos[i])
         time.sleep(1)
@@ -224,7 +230,7 @@ if __name__ == "__main__":
         current_position = goal_pos[i]
 
     env.visualize(current_position=current_position, goal_pos=goal_pos[4])
-    time.sleep(1)
+    time.sleep(10)
 
     # env._set_rand_obstacles()
     # start = (0, 0, -1)
