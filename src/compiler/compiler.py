@@ -28,7 +28,7 @@ class Compiler():
         self.display_collision_map = display_collision_map
 
         if self.collision_avoidance:
-            self.collision_manager = CollisionManager(simulation=simulation, camera_intrinsics=drone_api.get_camera_intrinsics(), max_x=100, max_y=100, max_z=20)
+            self.collision_manager = CollisionManager(simulation=simulation, camera_intrinsics=drone_api.get_camera_intrinsics(), max_x=15, max_y=15, max_z=15)
             self._startup_sequence()
 
             # if display_collision_map:
@@ -41,7 +41,7 @@ class Compiler():
             self.collision_manager.update_state(depth_data=depth_img, curr_pos=self.drone_api.current_position())
 
             if self.display_collision_map:
-                self.collision_manager.collision_visuals(current_position_f=self.drone_api.current_position)
+                self.collision_manager.collision_visuals(current_position=self.drone_api.current_position())
 
             self.drone_api.rotate_n_deg(yaw_rate=90, duration=1)
 
@@ -64,7 +64,7 @@ class Compiler():
                 self.collision_manager.update_state(depth_data=depth_img, curr_pos=self.drone_api.current_position())
                 
                 if self.display_collision_map:
-                    self.collision_manager.collision_visuals(current_position_f=self.drone_api.current_position)
+                    self.collision_manager.collision_visuals(current_position=self.drone_api.current_position())
 
             vision_model.find_objects(rgb_image=rgb_img, depth_image=depth_img, classes=locate_objects)
             
@@ -103,7 +103,7 @@ class Compiler():
             self.collision_manager.update_state(depth_data=depth_img, curr_pos=self.drone_api.current_position())
 
             if self.display_collision_map:
-                self.collision_manager.collision_visuals(current_position_f=self.drone_api.current_position)
+                self.collision_manager.collision_visuals(current_position=self.drone_api.current_position())
 
     def run(self):
         while self.api_queue:

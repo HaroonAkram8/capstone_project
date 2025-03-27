@@ -12,7 +12,7 @@ class Environment():
 
         self.map = np.zeros(shape=(max_z, self.y_offset + max_y + 1, self.x_offset + max_x + 1))
 
-        self.neighbors = [(0, 0, 1), (0, 0, -1), (0, 1, 0), (0, -1, 0), (1, 0, 0)] #, (-1, 0, 0)]
+        self.neighbors = [(0, 0, 1), (0, 0, -1), (0, 1, 0), (0, -1, 0), (1, 0, 0), (-1, 0, 0)]
 
         self.plotter = pvqt.BackgroundPlotter()
 
