@@ -1,6 +1,6 @@
 import time
 import pprint
-import threading
+# import threading
 from collections import deque
 
 from src.compiler.converter.drone_api import DroneAPI
@@ -25,18 +25,24 @@ class Compiler():
         self.api_queue = deque()
 
         self.collision_avoidance = collision_avoidance
+        self.display_collision_map = display_collision_map
+
         if self.collision_avoidance:
             self.collision_manager = CollisionManager(simulation=simulation, camera_intrinsics=drone_api.get_camera_intrinsics(), max_x=100, max_y=100, max_z=20)
             self._startup_sequence()
 
-            if display_collision_map:
-                thread = threading.Thread(target=self.collision_manager.collision_visuals, args=self.drone_api.current_position, daemon=True)
-                thread.start()
+            # if display_collision_map:
+            #     thread = threading.Thread(target=self.collision_manager.collision_visuals, args=self.drone_api.current_position, daemon=True)
+            #     thread.start()
 
     def _startup_sequence(self,):
         for i in range(4):
             _, depth_img = self.drone_api.get_image()
             self.collision_manager.update_state(depth_data=depth_img, curr_pos=self.drone_api.current_position())
+
+            if self.display_collision_map:
+                self.collision_manager.collision_visuals(current_position_f=self.drone_api.current_position)
+
             self.drone_api.rotate_n_deg(yaw_rate=90, duration=1)
 
     def compile(self, instructions: str, run: bool=True, vision_model: VisionModel=None):
@@ -56,6 +62,9 @@ class Compiler():
 
             if self.collision_avoidance:
                 self.collision_manager.update_state(depth_data=depth_img, curr_pos=self.drone_api.current_position())
+                
+                if self.display_collision_map:
+                    self.collision_manager.collision_visuals(current_position_f=self.drone_api.current_position)
 
             vision_model.find_objects(rgb_image=rgb_img, depth_image=depth_img, classes=locate_objects)
             
@@ -92,6 +101,9 @@ class Compiler():
         if self.collision_avoidance:
             _, depth_img = self.drone_api.get_image()
             self.collision_manager.update_state(depth_data=depth_img, curr_pos=self.drone_api.current_position())
+
+            if self.display_collision_map:
+                self.collision_manager.collision_visuals(current_position_f=self.drone_api.current_position)
 
     def run(self):
         while self.api_queue:
