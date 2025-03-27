@@ -104,7 +104,7 @@ class Compiler():
                 pprint.pprint(log)
                 print(DEBUG_SEPARATOR)
 
-            if is_async:
+            if False and is_async:
                 func(**args).join()
                 time.sleep(1)
                 continue
@@ -174,7 +174,7 @@ class Compiler():
         
         func, args, is_async = self.api_queue.popleft()
 
-        if is_async:
+        if False and is_async:
             func(**args).join()
             return
         
@@ -182,13 +182,15 @@ class Compiler():
 
 # Example usage
 if __name__ == "__main__":
-    example1 = "DISTANCE_MOVE forward_distance=5"
+    # example1 = "DISTANCE_MOVE up_distance=-2 velocity=5"
+    # example1 = "velocity_move up_velocity=-3 duration=1"
+    example1 = "land, DISTANCE_MOVE forward_distance=-2 velocity=5"
 
     drone = DroneAPI()
     vision_model = VisionModel()
 
     param_gen = ParameterGenerator(current_position=drone.current_position)
-    compiler = Compiler(drone_api=drone, param_gen=param_gen, debug=False)
+    compiler = Compiler(drone_api=drone, param_gen=param_gen, debug=False, collision_avoidance=False)
     compiler.compile(instructions=example1, vision_model=vision_model)
     # compiler.compile(instructions=example1, run=False)
     # compiler.run()
