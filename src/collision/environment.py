@@ -17,8 +17,6 @@ class Environment():
         self.plotter = pvqt.BackgroundPlotter()
 
         self.ticker = 0
-        array = self.map.transpose(2, 1, 0)
-        self.obstacle_mesh = pv.ImageData(dimensions=np.array(array.shape) + 1)
     
     def set(self, val: int, x: int, y: int, z: int):
         self.map[-z + 1][y + self.y_offset][x + self.x_offset] = val
@@ -27,8 +25,8 @@ class Environment():
         return self.map[-z + 1][y + self.y_offset][x + self.x_offset]
     
     def real_to_env(self, x, y, z):
-        x = int(round(max(min(x + self.x_offset, self.x_offset * 2), -self.x_offset * 2)))
-        y = int(round(max(min(y + self.y_offset, self.y_offset * 2), -self.y_offset * 2)))
+        x = int(round(max(min(x + self.x_offset, self.x_offset * 2), 0)))
+        y = int(round(max(min(y + self.y_offset, self.y_offset * 2), 0)))
         z = int(round(max(min(-z + 1, self.max_z - 1), 0)))
 
         return z, y, x
@@ -40,16 +38,26 @@ class Environment():
 
         return x, y, z
     
-    def visualize(self, current_position: tuple, spacing: float=1.0, cube_size: float=1.0):
-        self.plotter.view_isometric()
+    def visualize(self, current_position: dict, spacing: float=1.0, cube_size: float=1.0):
         self.plotter.clear()
-        
+
         array = self.map.transpose(2, 1, 0)
 
-        self.obstacle_mesh.overwrite(pv.ImageData(dimensions=np.array(array.shape) + 1))
-        self.obstacle_mesh.cell_data["values"] = array.flatten(order="F")
+        obstacle_mesh = pv.ImageData(dimensions=np.array(array.shape) + 1)
+        obstacle_mesh.cell_data["values"] = array.flatten(order="F")
 
-        self.plotter.add_mesh(self.obstacle_mesh.threshold(0.5), color="red", show_edges=True, edge_color="black", name="mymesh")
+        self.plotter.add_mesh(obstacle_mesh.threshold(0.5), color="red", show_edges=True, edge_color="black")
+
+        grid_size = (10, 10, 5)
+        cube_size = 1
+
+        array = np.ones(grid_size)
+
+        grid_mesh = pv.ImageData(dimensions=np.array(array.shape) + 1)
+        grid_mesh.spacing = (cube_size, cube_size, cube_size)
+        grid_mesh = obstacle_mesh.cast_to_unstructured_grid()
+        self.plotter.add_mesh(grid_mesh, show_edges=True, color=None, style='wireframe', line_width=0.1)
+        self.plotter.remove_scalar_bar()
 
         z, y, x = -current_position["z"] + 0.5, current_position["y"] + 0.5, current_position["x"] + 0.5
 
@@ -59,7 +67,7 @@ class Environment():
 
         cube = pv.Cube(center=(x * spacing, y * spacing, z * spacing), x_length=cube_size, y_length=cube_size, z_length=cube_size)
         
-        self.plotter.add_mesh(cube, color='green', show_edges=True, edge_color="black")
+        self.plotter.add_mesh(cube, color='green', show_edges=True, edge_color="black", name="mymesh")
 
         self.plotter.render()
         self.plotter.app.processEvents()
@@ -161,30 +169,5 @@ class Environment():
         for x in range(x_max):
             for y in range(y_max):
                 for z in range(z_max):
-                    if random.random() < 0.1:
+                    if random.random() < 0.05:
                         self.map[z][y][x] = 1
-
-if __name__ == "__main__":
-    import time
-    env = Environment(max_x=10, max_y=10, max_z=5)
-
-    # current_position = {
-    #     "x": 2,
-    #     "y": 10,
-    #     "z": -3
-    # }
-
-    # while True:
-    #     env._set_rand_obstacles()
-    #     env.visualize(current_position=current_position)
-
-    #     time.sleep(1)
-
-    env._set_rand_obstacles()
-    start = (9, 8, -3)
-    goal = (-4, 5, -3)
-
-    print(env.real_to_env(x=goal[0], y=goal[1], z=goal[2]))
-    print(env.get_path(start, goal))
-
-    print(env.env_to_real(x=6, y=15, z=4))

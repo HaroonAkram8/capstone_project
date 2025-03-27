@@ -17,6 +17,14 @@ class ParameterGenerator():
         if cmd not in self.mappings:
             return parameters
         
+        z_params = ["up_distance", "up_velocity", "z"]
+        for p in z_params:
+            if p in parameters:
+                if parameters[p][0] == '-':
+                    parameters[p] = parameters[p][1:]
+                else:
+                    parameters[p] = '-' + parameters[p]
+        
         gen_p = self.mappings[cmd](parameters=parameters)
 
         for key in gen_p:
@@ -103,8 +111,13 @@ class ParameterGenerator():
         try:
             value = float(parameter_value)
         except ValueError:
+            is_negative = parameter_value[0] == '-'
+            parameter_value = parameter_value.strip("-")
+
             if parameter_value in KEY_WORDS:
                 value = KEY_WORDS[parameter_value]
+                if is_negative:
+                    value = -value
             else:
                 value = 1
         
@@ -153,7 +166,9 @@ if __name__ == "__main__":
         }
 
     example1 = {
-        "right_distance": '7',
+        "forward_distance": "-medium",
+        "right_distance": '5',
+        "up_distance": 'medium',
         "velocity": '4',
     }
 

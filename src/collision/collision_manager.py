@@ -11,7 +11,11 @@ class CollisionManager:
             self.locate = irl_locate
         
         self.env = Environment(max_x=max_x, max_y=max_y, max_z=max_z)
+        self.neighbors = [(0, 0, 0), (0, 0, 1), (0, 0, -1), (0, 1, 0), (0, -1, 0), (1, 0, 0), (-1, 0, 0)]
     
+    def collision_visuals(self, current_position):
+        self.env.visualize(current_position=current_position)
+
     def set_camera_intrinsics(self, camera_intrinsics):
         self.camera_intrinsics = camera_intrinsics
 
@@ -24,22 +28,30 @@ class CollisionManager:
         for img_x in range(0, 640, 10):
             for img_y in range(0, 480, 10):
                 location, is_max = self.locate(depth_data=depth_data, camera_intrinsics=self.camera_intrinsics, x_centre=img_x, y_centre=img_y, curr_pos=curr_pos)
-                
+
                 if location is None:
                     continue
 
-                x = round(location['x'])
-                y = round(location['y'])
-                z = round(location['z'])
+                x = int(round(location['x']))
+                y = int(round(location['y']))
+                z = int(round(location['z']))
 
-                if z < 1:
+                if z > -1:
                     continue
                 
                 if not is_max:
-                    self.env.set(val=1, x=x, y=y, z=z)
-                    new_obstacles[(x, y, z)] = 1
+                    for dx, dy, dz in self.neighbors:
+                        new_x = x + dx
+                        new_y = y + dy
+                        new_z = z + dz
+
+                        if (new_x, new_y, new_z) in new_obstacles:
+                            continue
+                        
+                        self.env.set(val=1, x=new_x, y=new_y, z=new_z)
+                        new_obstacles[(new_x, new_y, new_z)] = 1
                 
-                self._clear_protocol(curr_pos=curr_pos, new_obstacles=new_obstacles, x=x, y=y, z=z)
+                # self._clear_protocol(curr_pos=curr_pos, new_obstacles=new_obstacles, x=x, y=y, z=z)
 
     def _clear_protocol(self, curr_pos, new_obstacles, x: int, y: int, z: int):
         z1, y1, x1 = self.env.real_to_env(x=x, y=y, z=z)
@@ -97,7 +109,7 @@ class CollisionManager:
                 p2 += 2 * dx
 
         points.append((x2, y2, z2))
-        
+
         return points
 
 if __name__ == "__main__":

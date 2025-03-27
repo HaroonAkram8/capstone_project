@@ -31,11 +31,14 @@ def _relative_locate(depth_data, camera_intrinsics, x_centre: int, y_centre: int
     X = (x_centre - cx) * Z / fx
     Y = (y_centre - cy) * Z / fy
 
-    return {
+    location = {
         "x": float(X),
         "y": float(Y),
         "z": float(Z)
-    }, Z == max_distance
+    }
+    is_max = Z == max_distance
+
+    return location, is_max
 
 def irl_locate(depth_data, x_centre: int, y_centre: int, curr_pos: dict):
     pass
