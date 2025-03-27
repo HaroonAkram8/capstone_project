@@ -49,9 +49,8 @@ class Compiler():
         parser = ParameterParser(instructions=instructions)
         parser.parse()
         commands, locate_objects = parser.cmd_seq()
-        print(commands)
 
-        if not do_locate and len(locate_objects) == 0 or vision_model is None:
+        if do_locate and len(locate_objects) == 0 or vision_model is None:
             self._compile_commands(commands=commands, run=run)
             return None
 
