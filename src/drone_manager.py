@@ -66,12 +66,12 @@ class DroneManager:
                 break
             
             curr_pos = self.drone.current_position(in_degrees=True, round_to_n=2)
-            prompt = f"Drone State: {str(curr_pos)}\nMovement Instructions: {query}"
+            prompt = f"Movement Instructions: {query}"
             obj_loc = self._compile_and_run(prompt=prompt)
 
             if obj_loc is not None:
                 print()
-                prompt = f"Drone State: {str(curr_pos)}\nObject Locations: {str(obj_loc)}\nMovement Instructions: {query}"
+                prompt = f"Object Locations: {str(obj_loc)}\nMovement Instructions: {query}"
                 self._compile_and_run(prompt=prompt, locate=False)
 
             input("Press Enter to continue...")

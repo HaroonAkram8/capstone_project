@@ -16,7 +16,7 @@ class ParameterParser():
             command, parameters = self._split(instruction=instruct)
             
             if command == LOCATE:
-                obj = parameters["object"].strip('"')
+                obj = parameters["object"].strip('"').strip("'")
                 self.locate_commands.append(obj)
                 continue
 
@@ -53,7 +53,7 @@ class ParameterParser():
 
 # Example usage
 if __name__ == "__main__":
-    example1 = "takeoff, locate object=chair, move x=1 y=2 z=-3 v=4, rotate deg=87, position_move x=7 v=9, locate object=table"
+    example1 = "takeoff, distance_move forward_distance=4 up_distance=3, locate object=table"
 
     parser = ParameterParser(instructions=example1)
     parser.parse()
