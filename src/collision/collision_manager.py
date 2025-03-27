@@ -25,8 +25,8 @@ class CollisionManager:
     def update_state(self, depth_data, curr_pos):
         new_obstacles = {}
 
-        for img_x in range(0, 640, 10):
-            for img_y in range(0, 480, 10):
+        for img_x in range(0, 640, 1):
+            for img_y in range(0, 480, 1):
                 location, is_max = self.locate(depth_data=depth_data, camera_intrinsics=self.camera_intrinsics, x_centre=img_x, y_centre=img_y, curr_pos=curr_pos)
 
                 if location is None:
