@@ -84,9 +84,6 @@ class DroneManager:
         response = self._land_state_handler(response=response)
         print(response)
 
-        if not locate and LOCATE in response:
-            return None
-
         obj_loc = self.compiler.compile(instructions=response, vision_model=self.vision_model, do_locate=locate)
         return obj_loc
     
