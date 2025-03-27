@@ -12,14 +12,14 @@ class Environment():
 
         self.map = np.zeros(shape=(max_z, self.y_offset + max_y + 1, self.x_offset + max_x + 1))
 
-        self.neighbors = [(0, 0, 1), (0, 0, -1), (0, 1, 0), (0, -1, 0), (1, 0, 0)] #, (-1, 0, 0)]
+        self.neighbors = [(0, 0, 1), (0, 0, -1), (0, 1, 0), (0, -1, 0), (1, 0, 0), (-1, 0, 0)]
 
         self.plotter = pvqt.BackgroundPlotter()
 
         self.ticker = 0
     
     def set(self, val: int, x: int, y: int, z: int):
-        self.map[-z + 1][y + self.y_offset][x + self.x_offset] = val
+        self.map[z][y + self.y_offset][x + self.x_offset] = val
     
     def get(self, x: int, y: int, z: int):
         return self.map[-z + 1][y + self.y_offset][x + self.x_offset]
@@ -38,26 +38,36 @@ class Environment():
 
         return x, y, z
     
-    def visualize(self, current_position: tuple, spacing: float=1.0, cube_size: float=1.0):
-        self.plotter.clear()
+    def visualize(self, current_position: dict, goal_pos: dict, spacing: float=1.0, cube_size: float=1.0):
+        # self.plotter.clear()
+        if self.ticker == 0:
+            array = self.map.transpose(2, 1, 0)
 
-        array = self.map.transpose(2, 1, 0)
+            obstacle_mesh = pv.ImageData(dimensions=np.array(array.shape) + 1)
+            obstacle_mesh.cell_data["values"] = array.flatten(order="F")
 
-        obstacle_mesh = pv.ImageData(dimensions=np.array(array.shape) + 1)
-        obstacle_mesh.cell_data["values"] = array.flatten(order="F")
+            self.plotter.add_mesh(obstacle_mesh.threshold(0.5), color="red", show_edges=True, edge_color="black")
 
-        self.plotter.add_mesh(obstacle_mesh.threshold(0.5), color="red", show_edges=True, edge_color="black")
+            grid_size = (10, 10, 5)
+            cube_size = 1
 
-        grid_size = (10, 10, 5)
-        cube_size = 1
+            array = np.ones(grid_size)
 
-        array = np.ones(grid_size)
+            grid_mesh = pv.ImageData(dimensions=np.array(array.shape) + 1)
+            grid_mesh.spacing = (cube_size, cube_size, cube_size)
+            grid_mesh = obstacle_mesh.cast_to_unstructured_grid()
+            self.plotter.add_mesh(grid_mesh, show_edges=True, color=None, style='wireframe', line_width=0.1)
+            self.plotter.remove_scalar_bar()
 
-        grid_mesh = pv.ImageData(dimensions=np.array(array.shape) + 1)
-        grid_mesh.spacing = (cube_size, cube_size, cube_size)
-        grid_mesh = obstacle_mesh.cast_to_unstructured_grid()
-        self.plotter.add_mesh(grid_mesh, show_edges=True, color=None, style='wireframe', line_width=0.1)
-        self.plotter.remove_scalar_bar()
+        z, y, x = -goal_pos["z"] + 0.5, goal_pos["y"] + 0.5, goal_pos["x"] + 0.5
+
+        z -= 1
+        y += self.y_offset
+        x += self.x_offset
+
+        cube = pv.Cube(center=(x * spacing, y * spacing, z * spacing), x_length=cube_size, y_length=cube_size, z_length=cube_size)
+        
+        self.plotter.add_mesh(cube, color='yellow', show_edges=True, edge_color="black", name="mymesh2")
 
         z, y, x = -current_position["z"] + 0.5, current_position["y"] + 0.5, current_position["x"] + 0.5
 
@@ -85,7 +95,7 @@ class Environment():
         if path is None:
             return None
         
-        path = self._simplify_path(path=path)
+        # path = self._simplify_path(path=path)
 
         if not to_real:
             return path
@@ -171,3 +181,60 @@ class Environment():
                 for z in range(z_max):
                     if random.random() < 0.05:
                         self.map[z][y][x] = 1
+
+if __name__ == "__main__":
+    import time
+    env = Environment(max_x=10, max_y=10, max_z=5)
+
+    all_obstacles = [(-2, 4, 0), (-2, 5, 0), (-1, 4, 0), (-1, 5, 0), (-2, 4, 1),
+                     (-7, 2, 0), (-7, 2, 1), (-7, 2, 2),
+                     (0, -1, 0),
+                     (8, 3, 0), (8, 4, 0), (8, 4, 1), (8, 4, 2), (8, 4, 1),
+                     (3, 9, 0),
+                     (-3, 10, 0), (-3, 10, 1),
+                     (-9, 1, 0), (-10, 2, 0), (-10, 2, 1),
+                     (5, -5, 0),
+                     (1, 1, 0), (1, 1, 1), (1, 1, 2), (1, 1, 1), (1, 1, 0), (1, 1, 0),
+                     (4, 4, 0), (4, 5, 0), (3, 4, 0), (3, 5, 0), (4, 4, 1), (4, 5, 1), (3, 4, 1), (3, 5, 1)]
+
+    for x, y, z in all_obstacles:
+        env.set(val=1, x=x, y=y, z=z)
+
+    current_position = {"x": -8, "y": 3, "z": -3}
+
+    goal_pos = [{"x": 10, "y": -4, "z": -2}, {"x": 5, "y": 5, "z": -3}, {"x": -8, "y": 5, "z": -4}, {"x": -7, "y": 4, "z": -1}, {"x": 9, "y": -8, "z": -3}]
+
+    for i in range(len(goal_pos)):
+        env.visualize(current_position=current_position, goal_pos=goal_pos[i])
+        time.sleep(1)
+
+        path = env.get_path(start_pos=(current_position["x"], current_position["y"], current_position["z"]),
+                            end_pos=(goal_pos[i]["x"], goal_pos[i]["y"], goal_pos[i]["z"]))
+
+        for x, y, z in path:
+            point = {
+                "x": x,
+                "y": y,
+                "z": z
+            }
+            env.visualize(current_position=point, goal_pos=goal_pos[i])
+
+            time.sleep(0.1)
+        
+        current_position = goal_pos[i]
+
+    env.visualize(current_position=current_position, goal_pos=goal_pos[4])
+    time.sleep(1)
+
+    # env._set_rand_obstacles()
+    # start = (0, 0, -1)
+    # goal = (-20, 0, -1)
+
+    # # print(env.real_to_env(x=goal[0], y=goal[1], z=goal[2]))
+    # # print(env.get_path(start, goal))
+
+    # print(goal)
+    # goal_env = env.real_to_env(x=goal[0], y=goal[1], z=goal[2])
+    # print(goal_env)
+    # real_goal = env.env_to_real(x=goal_env[2], y=goal_env[1], z=goal_env[0])
+    # print(real_goal)
