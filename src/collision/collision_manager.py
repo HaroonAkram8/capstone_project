@@ -13,6 +13,11 @@ class CollisionManager:
         self.env = Environment(max_x=max_x, max_y=max_y, max_z=max_z)
         self.neighbors = [(0, 0, 0), (0, 0, 1), (0, 0, -1), (0, 1, 0), (0, -1, 0), (1, 0, 0), (-1, 0, 0)]
     
+    def collision_visuals(self, current_position_f):
+        while True:
+            self.env.visualize(current_position=current_position_f())
+            time.sleep(1)
+
     def set_camera_intrinsics(self, camera_intrinsics):
         self.camera_intrinsics = camera_intrinsics
 

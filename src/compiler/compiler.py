@@ -1,5 +1,6 @@
 import time
 import pprint
+import threading
 from collections import deque
 
 from src.compiler.converter.drone_api import DroneAPI
@@ -10,7 +11,7 @@ from src.vision.vision import VisionModel
 from src.collision.collision_manager import CollisionManager
 
 class Compiler():
-    def __init__(self, drone_api: DroneAPI, param_gen: ParameterGenerator, debug: bool=False, simulation: bool=True, collision_avoidance: bool=True):
+    def __init__(self, drone_api: DroneAPI, param_gen: ParameterGenerator, debug: bool=False, simulation: bool=True, collision_avoidance: bool=True, display_collision_map: bool=False):
         self.drone_api = drone_api
         self.param_gen = param_gen
         self.debug = debug
@@ -27,6 +28,10 @@ class Compiler():
         if self.collision_avoidance:
             self.collision_manager = CollisionManager(simulation=simulation, camera_intrinsics=drone_api.get_camera_intrinsics(), max_x=100, max_y=100, max_z=20)
             self._startup_sequence()
+
+            if display_collision_map:
+                thread = threading.Thread(target=self.collision_manager.collision_visuals, args=self.drone_api.current_position, daemon=True)
+                thread.start()
 
     def _startup_sequence(self,):
         for i in range(4):
@@ -177,7 +182,7 @@ class Compiler():
 
 # Example usage
 if __name__ == "__main__":
-    example1 = "DISTANCE_MOVE forward_distance=20"
+    example1 = "DISTANCE_MOVE forward_distance=5"
 
     drone = DroneAPI()
     vision_model = VisionModel()
