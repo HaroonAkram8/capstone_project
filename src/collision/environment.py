@@ -38,7 +38,7 @@ class Environment():
 
         return x, y, z
     
-    def visualize(self, current_position: tuple, spacing: float=1.0, cube_size: float=1.0):
+    def visualize(self, current_position: dict, spacing: float=1.0, cube_size: float=1.0):
         self.plotter.clear()
 
         array = self.map.transpose(2, 1, 0)

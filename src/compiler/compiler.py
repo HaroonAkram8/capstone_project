@@ -182,15 +182,15 @@ class Compiler():
 
 # Example usage
 if __name__ == "__main__":
-    # example1 = "DISTANCE_MOVE up_distance=-2 velocity=5"
-    # example1 = "velocity_move up_velocity=-3 duration=1"
-    example1 = "land, DISTANCE_MOVE forward_distance=-2 velocity=5"
+    # test = "DISTANCE_MOVE up_distance=-2 velocity=5"
+    # test = "velocity_move up_velocity=-3 duration=1"
+    test = "DISTANCE_MOVE forward_distance=2 velocity=5"
 
     drone = DroneAPI()
     vision_model = VisionModel()
 
     param_gen = ParameterGenerator(current_position=drone.current_position)
-    compiler = Compiler(drone_api=drone, param_gen=param_gen, debug=False, collision_avoidance=False)
-    compiler.compile(instructions=example1, vision_model=vision_model)
-    # compiler.compile(instructions=example1, run=False)
+    compiler = Compiler(drone_api=drone, param_gen=param_gen, debug=False, collision_avoidance=True, display_collision_map=True)
+    compiler.compile(instructions=test, vision_model=vision_model)
+    # compiler.compile(instructions=test, run=False)
     # compiler.run()
