@@ -83,6 +83,10 @@ class Compiler():
 
             if run:
                 self.run()
+        
+        if self.collision_avoidance:
+            _, depth_img = self.drone_api.get_image()
+            self.collision_manager.update_state(depth_data=depth_img, curr_pos=self.drone_api.current_position())
 
     def run(self):
         while self.api_queue:
