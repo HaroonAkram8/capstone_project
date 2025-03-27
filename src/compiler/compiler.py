@@ -45,12 +45,12 @@ class Compiler():
 
             self.drone_api.rotate_n_deg(yaw_rate=90, duration=1)
 
-    def compile(self, instructions: str, run: bool=True, vision_model: VisionModel=None):
+    def compile(self, instructions: str, run: bool=True, vision_model: VisionModel=None, do_locate: bool=True):
         parser = ParameterParser(instructions=instructions)
         parser.parse()
         commands, locate_objects = parser.cmd_seq()
 
-        if len(locate_objects) == 0 or vision_model is None:
+        if not do_locate and len(locate_objects) == 0 or vision_model is None:
             self._compile_commands(commands=commands, run=run)
             return None
 
