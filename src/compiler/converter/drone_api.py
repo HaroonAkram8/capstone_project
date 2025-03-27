@@ -18,21 +18,63 @@ class DroneAPI():
         self.camera_intrinsics = self._camera_intrinsics(image_width=image_width, image_height=image_height)
 
         self.functions = {
-            MOVE_POS: self.client.moveToPositionAsync,
-            MOVE_DIST: self.client.moveToPositionAsync,
-            MOVE_VEL: self.client.moveByVelocityAsync,
-            ROTATE: self.rotate_n_deg, #self.client.rotateByYawRateAsync,
-            TAKEOFF: self.client.takeoffAsync,
-            LAND: self.client.landAsync,
+            MOVE_POS: self.move_to_position,
+            MOVE_DIST: self.move_to_position,
+            MOVE_VEL: self.move_by_velocity,
+            ROTATE: self.rotate_n_deg,
+            TAKEOFF: self.takeoff,
+            LAND: self.land,
             WAIT: self.__wait__,
             END: self.__end__,
         }
 
-        self._startup_sequence()
+        self.landed = True
 
-    def _startup_sequence(self,):
-        self.client.takeoffAsync().join()
+        self.takeoff()
+
+    def takeoff(self,):
+        if self.landed:
+            self.client.takeoffAsync().join()
+            self.landed = False
+
+            time.sleep(1)
+    
+    def land(self,):
+        self.client.landAsync().join()
+        self.landed = True
         time.sleep(1)
+    
+    def rotate_n_deg(self, yaw_rate, duration):
+        self.takeoff()
+
+        self.client.rotateByYawRateAsync(yaw_rate, duration).join()
+        self.client.rotateByYawRateAsync(0, 1).join()
+
+        time.sleep(1)
+    
+    def move_to_position(self, x, y, z, velocity):
+        self.takeoff()
+
+        z = min(z, -1)
+        velocity = self._get_max_velocity(x=x, y=y, z=z, velocity=velocity)
+        self.client.moveToPositionAsync(x=x, y=y, z=z, velocity=velocity).join()
+
+        time.sleep(1)
+
+    def move_by_velocity(self, vx, vy, vz, duration):
+        self.takeoff()
+
+        self.client.moveByVelocityAsync(vx=vx, vy=vy, vz=vz, duration=duration)
+        time.sleep(1)
+
+    def _get_max_velocity(self, x, y, z, velocity):
+        curr_pos = self.current_position()
+
+        difference = math.pow(x - curr_pos["x"], 2) + math.pow(y - curr_pos["y"], 2) + math.pow(z - curr_pos["z"], 2)
+        difference = int(math.sqrt(difference))
+
+        velocity = min(difference, velocity)
+        return velocity
     
     def get_camera_intrinsics(self,):
         return self.camera_intrinsics
@@ -48,7 +90,7 @@ class DroneAPI():
     
     def safe_land(self):
         # In future, ensure landing space is large enough to support drone
-        self.client.landAsync().join()
+        self.land()
         self.__end__()
 
     def get_image(self):
@@ -71,13 +113,16 @@ class DroneAPI():
             if responses[1].image_data_float:
                 depth_img = np.array(responses[1].image_data_float, dtype=np.float32)
                 depth_img = depth_img.reshape((responses[1].height, responses[1].width))
+
+                # depth = cv2.normalize(depth_img, None, 0, 255, cv2.NORM_MINMAX)
+                # depth = np.uint8(depth)
+                # depth = cv2.applyColorMap(depth, cv2.COLORMAP_JET)
+
+                # cv2.imshow("Depth Map", depth)
+                # cv2.waitKey(0)
+                # cv2.destroyAllWindows()
         
         return rgb_img, depth_img
-    
-    def rotate_n_deg(self, yaw_rate, duration):
-        self.client.rotateByYawRateAsync(yaw_rate, duration).join()
-        self.client.rotateByYawRateAsync(0, 1).join()
-        time.sleep(1)
     
     def current_position(self, in_degrees: bool=False, round_to_n: int=-1):
         state = self.client.getMultirotorState()
@@ -90,7 +135,7 @@ class DroneAPI():
             "y": position.y_val,
             "z": position.z_val,
             "yaw": airsim.to_eularian_angles(orientation)[2],
-            "landed": state.landed_state == airsim.LandedState.Landed,
+            "landed": self.landed,
         }
 
         if in_degrees:
