@@ -136,6 +136,10 @@ class Compiler():
         path = []
         if self.collision_avoidance and cmd in [MOVE_POS, MOVE_DIST, MOVE_VEL]:
             path = self._get_path(goal_position=f_params)
+        
+        if path is None:
+            print("The location specified is within collision distance of another object, skipped...")
+            return
 
         if len(path) > 1:
             f = self.drone_api.get_function(MOVE_POS)

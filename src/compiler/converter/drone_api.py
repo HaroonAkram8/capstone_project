@@ -28,8 +28,7 @@ class DroneAPI():
             END: self.__end__,
         }
 
-        state = self.client.getMultirotorState()
-        self.landed = state.landed_state == airsim.LandedState.Landed
+        self.landed = True
 
         self.takeoff()
 
